@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+option go_package = ".;pb";
+
+message LogoutRequest {
+  string token = 36;
+}
+message LogoutResponse{
+  bool status = 37;
+}

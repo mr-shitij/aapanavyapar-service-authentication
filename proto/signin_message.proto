@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+option go_package = ".;pb";
+
+import "common_message.proto";
+
+message SignInForMailBaseRequest {
+  string mail = 8;
+  string password = 9;
+}
+
+message SignInForMailBaseResponse {
+    oneof data{
+      ResponseData responseData = 10;
+      ProblemCode code = 11;
+    }
+    bool authorized = 51;
+}
+
+message SignInForPhoneBaseRequest {
+  string contact = 12;
+}
+
+message SignInForPhoneBaseResponse {
+  string tokenForOTP = 13;
+}
+
+message ValidateOTPForPhoneBaseRequest {
+  string tokenForOTP = 14;
+  string otp = 15;
+}
+
+message ValidateOTPForPhoneBaseResponse {
+  string token = 16;
+  string refreshToken = 17;
+}
