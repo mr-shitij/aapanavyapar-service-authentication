@@ -10,8 +10,6 @@ import "logout_message.proto";
 service Authentication {
   rpc Signup (SignUpRequest) returns (SignUpResponse);
   rpc SignInWithMail (SignInForMailBaseRequest) returns (SignInForMailBaseResponse) {};
-  rpc SignInWithPhone (SignInForPhoneBaseRequest) returns (SignInForPhoneBaseResponse) {};
-  rpc ValidateOTP (ValidateOTPForPhoneBaseRequest) returns (ValidateOTPForPhoneBaseResponse) {};
   rpc GetNewToken (newTokenRequest) returns (newTokenResponse) {};
   rpc ContactConformation (ContactConformationRequest) returns (ContactConformationResponse) {};
   rpc ResendOTP (ResendOTPRequest) returns (ResendOTPResponse) {};

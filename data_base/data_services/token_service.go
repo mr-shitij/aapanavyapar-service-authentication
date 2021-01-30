@@ -5,7 +5,6 @@ import (
 	"aapanavyapar_service_authentication/data_base/structs"
 	"context"
 	"fmt"
-	"github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
 	"github.com/o1egl/paseto/v2"
 	"google.golang.org/grpc/codes"
@@ -17,14 +16,24 @@ import (
 const (
 	MaxTokenAttempt    = 12
 	RefreshTokenExpiry = 366 * time.Hour // 2 weeks
-	AuthTokenExpiry    = 24  * time.Hour // 1 day
+	AuthTokenExpiry    = 24 * time.Hour  // 1 day
+
+	MaxTokenAttemptForUnAuthorized    = 7
+	RefreshTokenExpiryForUnAuthorized = time.Minute * 30 // 1/2 hours
+	AuthTokenExpiryForUnAuthorized    = time.Minute * 5  // 5 minutes
 )
 
-func (dataService *DataServices) GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx context.Context, userId string, authorized bool) (string, string, error) {
-	now := time.Now()
-	exp := now.Add(RefreshTokenExpiry) // Two Weeks
-	nbt := now
+func GenerateRefreshToken(userId string, authorized bool) (string, string, error) {
 
+	now := time.Now()
+
+	var exp time.Time
+	if authorized {
+		exp = now.Add(RefreshTokenExpiry)
+	} else {
+		exp = now.Add(RefreshTokenExpiryForUnAuthorized)
+	}
+	nbt := now
 
 	refreshTokenId, err := uuid.NewRandom()
 	if err != nil {
@@ -33,7 +42,7 @@ func (dataService *DataServices) GenerateRefreshAndAuthTokenAndAddRefreshToCash(
 
 	jsonToken := paseto.JSONToken{
 		Audience:   userId,
-		Subject: 	refreshTokenId.String(),
+		Subject:    refreshTokenId.String(),
 		Issuer:     os.Getenv("TOKEN_ISSUER"),
 		IssuedAt:   now,
 		Expiration: exp,
@@ -49,18 +58,29 @@ func (dataService *DataServices) GenerateRefreshAndAuthTokenAndAddRefreshToCash(
 		return "", "", status.Errorf(codes.Internal, "unable to encrypt token  : %w", err)
 	}
 
+	return token, refreshTokenId.String(), nil
+}
+
+func (dataService *DataServices) GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx context.Context, userId string, authorized bool) (string, string, error) {
+
+	token, refreshTokenId, err := GenerateRefreshToken(userId, authorized)
+
 	cashData := structs.RefreshTokenCashData{
 		RefreshToken:   token,
 		AllocatedToken: 0,
 	}
-	err = dataService.Cash.Set(ctx, refreshTokenId.String(),
-		cashData.Marshal(), RefreshTokenExpiry).Err()
 
-	if err != nil {
-		return "", "", status.Errorf(codes.Internal, "unable to add token to cash  : %w", err)
+	if authorized {
+		err = dataService.SetDataToCash(ctx, refreshTokenId, cashData.Marshal(), RefreshTokenExpiry)
+	} else {
+		err = dataService.SetDataToCash(ctx, refreshTokenId, cashData.Marshal(), RefreshTokenExpiryForUnAuthorized)
 	}
 
-	authToken, err := GenerateAuthToken(userId, refreshTokenId.String(), authorized)
+	if err != nil {
+		return "", "", err
+	}
+
+	authToken, err := GenerateAuthToken(userId, refreshTokenId, authorized)
 
 	if err != nil {
 		return "", "", status.Errorf(codes.Internal, "unable to create auth token  : %w", err)
@@ -69,7 +89,6 @@ func (dataService *DataServices) GenerateRefreshAndAuthTokenAndAddRefreshToCash(
 	return token, authToken, nil
 }
 
-
 func (dataService *DataServices) ValidateRefreshTokenAndGenerateNewAuthToken(ctx context.Context, tokenString string) (bool, string, error) {
 
 	receivedRefreshToken, err := dataService.ValidateToken(ctx, tokenString, os.Getenv("REFRESH_TOKEN_SECRETE"))
@@ -77,16 +96,9 @@ func (dataService *DataServices) ValidateRefreshTokenAndGenerateNewAuthToken(ctx
 		return false, "", err
 	}
 
-
-	val, err := dataService.Cash.Get(ctx, receivedRefreshToken.Subject).Result()
-
-	switch {
-		case err == redis.Nil:
-			return false, "", status.Errorf(codes.NotFound, "Token Not Exist %v", err)
-		case err != nil:
-			return false, "", status.Errorf(codes.Internal, "Unable To Fetch Value %v", err)
-		case val == "":
-			return false, "", status.Errorf(codes.Unknown, "Empty Value %v", err)
+	val, err := dataService.GetDataFormCash(ctx, receivedRefreshToken.Subject)
+	if err != nil {
+		return false, "", err
 	}
 
 	var cashData structs.RefreshTokenCashData
@@ -94,20 +106,19 @@ func (dataService *DataServices) ValidateRefreshTokenAndGenerateNewAuthToken(ctx
 
 	fmt.Println(cashData)
 
-	if cashData.AllocatedToken > MaxTokenAttempt || cashData.RefreshToken != tokenString {
-		return false, "", status.Errorf(codes.ResourceExhausted, "Refresh Token Is Reach To Its Limit %v", err)
-	}
-
-	if err := helpers.ContextError(ctx); err != nil {
-		return false, "", err
-	}
-
-
 	var authorized bool
 	err = receivedRefreshToken.Get("authorized", &authorized)
 	fmt.Println("authorized  : ", authorized)
 	if err != nil {
 		return false, "", status.Errorf(codes.PermissionDenied, "Token Is Not Valid %v", err)
+	}
+
+	if ((authorized && cashData.AllocatedToken > MaxTokenAttempt) || (!authorized && cashData.AllocatedToken > MaxTokenAttemptForUnAuthorized)) || cashData.RefreshToken != tokenString {
+		return false, "", status.Errorf(codes.ResourceExhausted, "Refresh Token Is Reach To Its Limit %v", err)
+	}
+
+	if err := helpers.ContextError(ctx); err != nil {
+		return false, "", err
 	}
 
 	// Note Update Cash When the user validates his contact number
@@ -119,7 +130,6 @@ func (dataService *DataServices) ValidateRefreshTokenAndGenerateNewAuthToken(ctx
 	//	}
 	//}
 
-
 	token, err := GenerateAuthToken(receivedRefreshToken.Audience, receivedRefreshToken.Subject, authorized)
 	if err != nil {
 		return false, "", status.Errorf(codes.Internal, "Unable To Create The Token %v", err)
@@ -129,22 +139,31 @@ func (dataService *DataServices) ValidateRefreshTokenAndGenerateNewAuthToken(ctx
 		RefreshToken:   cashData.RefreshToken,
 		AllocatedToken: cashData.AllocatedToken + 1,
 	}
-	err = dataService.Cash.Set(ctx, receivedRefreshToken.Subject,
-		tokenCashData.Marshal(), RefreshTokenExpiry).Err()
+
+	if authorized {
+		err = dataService.SetDataToCash(ctx, receivedRefreshToken.Subject,
+			tokenCashData.Marshal(), RefreshTokenExpiry)
+	} else {
+		err = dataService.SetDataToCash(ctx, receivedRefreshToken.Subject,
+			tokenCashData.Marshal(), RefreshTokenExpiryForUnAuthorized)
+	}
 
 	if err != nil {
-		return false, "", status.Errorf(codes.Internal, "unable to add token to cash  : %w", err)
+		return false, "", err
 	}
 
 	return true, token, nil
 }
 
-
-
 func GenerateAuthToken(userId string, refreshTokenId string, authorized bool) (string, error) {
 
 	now := time.Now()
-	exp := now.Add(AuthTokenExpiry) // One Day
+	var exp time.Time
+	if authorized {
+		exp = now.Add(AuthTokenExpiry)
+	} else {
+		exp = now.Add(AuthTokenExpiryForUnAuthorized)
+	}
 	nbt := now
 
 	jsonToken := paseto.JSONToken{
@@ -189,22 +208,15 @@ func (dataService *DataServices) ValidateToken(ctx context.Context, tokenString,
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid Argument ", err)
 	}
 
-
-	val, err := dataService.Cash.Get(ctx, receivedToken.Subject).Result()
-
-	switch {
-	case err == redis.Nil:
-		return nil, status.Errorf(codes.NotFound, "Token Not Exist %v", err)
-	case err != nil:
-		return nil, status.Errorf(codes.Internal, "Unable To Fetch Value %v", err)
-	case val == "":
-		return nil, status.Errorf(codes.Unknown, "Empty Value %v", err)
+	_, err = dataService.GetDataFormCash(ctx, receivedToken.Subject)
+	if err != nil {
+		return nil, err
 	}
-
 
 	_, err = uuid.Parse(receivedToken.Audience)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid Argument ", err)
 	}
+
 	return &receivedToken, nil
 }

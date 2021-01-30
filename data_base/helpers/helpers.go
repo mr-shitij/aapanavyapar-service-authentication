@@ -3,6 +3,7 @@ package helpers
 import (
 	"aapanavyapar_service_authentication/pb"
 	"context"
+	"encoding/base64"
 	"github.com/microcosm-cc/bluemonday"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -11,21 +12,21 @@ import (
 	"strings"
 )
 
-func ContextError(ctx context.Context) error{
+func ContextError(ctx context.Context) error {
 
 	switch ctx.Err() {
 	case context.Canceled:
 		log.Println("Request Canceled")
-		return status.Error(codes.DeadlineExceeded,"Request Canceled")
+		return status.Error(codes.DeadlineExceeded, "Request Canceled")
 	case context.DeadlineExceeded:
 		log.Println("DeadLine Exceeded")
-		return status.Error(codes.DeadlineExceeded,"DeadLine Exceeded")
+		return status.Error(codes.DeadlineExceeded, "DeadLine Exceeded")
 	default:
 		return nil
 	}
 }
 
-func SanitizeAndValidateUserName(userName string) (string, error){
+func SanitizeAndValidateUserName(userName string) (string, error) {
 	p := bluemonday.UGCPolicy()
 	userName = p.Sanitize(strings.TrimSpace(userName))
 	if userName == "" {
@@ -34,7 +35,7 @@ func SanitizeAndValidateUserName(userName string) (string, error){
 	return userName, nil
 }
 
-func SanitizeAndValidateEmailAddress(email string) (string, error){
+func SanitizeAndValidateEmailAddress(email string) (string, error) {
 	p := bluemonday.UGCPolicy()
 	email = p.Sanitize(strings.TrimSpace(email))
 	if email != "" {
@@ -45,7 +46,7 @@ func SanitizeAndValidateEmailAddress(email string) (string, error){
 	}
 	return "", status.Error(codes.Code(pb.ProblemCode_NoEmailIsProvided), "Email Address Is Empty")
 }
-func SanitizeAndValidatePhoneNumber(phoneNumber string) (string, error){
+func SanitizeAndValidatePhoneNumber(phoneNumber string) (string, error) {
 	p := bluemonday.UGCPolicy()
 	phoneNumber = p.Sanitize(strings.TrimSpace(phoneNumber))
 	if phoneNumber != "" {
@@ -56,7 +57,7 @@ func SanitizeAndValidatePhoneNumber(phoneNumber string) (string, error){
 	}
 	return "", status.Error(codes.Code(pb.ProblemCode_NoPhoneNumberIsProvided), "Phone Number  Is Empty")
 }
-func SanitizeAndValidatePinCode(pinCode string) (string, error){
+func SanitizeAndValidatePinCode(pinCode string) (string, error) {
 	p := bluemonday.UGCPolicy()
 	pinCode = p.Sanitize(strings.TrimSpace(pinCode))
 	if pinCode != "" {
@@ -67,7 +68,7 @@ func SanitizeAndValidatePinCode(pinCode string) (string, error){
 	}
 	return "", status.Error(codes.Code(pb.ProblemCode_NoPinCodeIsProvided), "pin Code Is Empty")
 }
-func SanitizeAndValidatePassword(password string) (string, error){
+func SanitizeAndValidatePassword(password string) (string, error) {
 	if password != "" {
 		if len(password) < 8 {
 			return "", status.Error(codes.Code(pb.ProblemCode_InvalidPasswordLength), "Invalid Password Length")
@@ -77,7 +78,6 @@ func SanitizeAndValidatePassword(password string) (string, error){
 	return "", status.Error(codes.Code(pb.ProblemCode_NoPasswordIsProvided), "Password Is Empty")
 }
 
-
 func SanitizeAndValidate(user *pb.SignUpRequest) (*pb.SignUpRequest, error) {
 
 	var err error
@@ -85,7 +85,7 @@ func SanitizeAndValidate(user *pb.SignUpRequest) (*pb.SignUpRequest, error) {
 		return nil, err
 	}
 	if user.Email, err = SanitizeAndValidateEmailAddress(user.Email); err != nil {
-		if e, ok := status.FromError(err); ok && e.Code() != codes.Code(pb.ProblemCode_NoEmailIsProvided){
+		if e, ok := status.FromError(err); ok && e.Code() != codes.Code(pb.ProblemCode_NoEmailIsProvided) {
 			return nil, err
 		}
 	}
@@ -107,4 +107,17 @@ func SanitizeAndValidate(user *pb.SignUpRequest) (*pb.SignUpRequest, error) {
 		Email:    user.Email,
 		PinCode:  user.PinCode,
 	}, nil
+}
+
+func EncodePhoneNo(phoNo string) string {
+	sEnc := base64.StdEncoding.EncodeToString([]byte(phoNo))
+	return sEnc
+}
+
+func DecodePhoneNo(message string) (string, error) {
+	sDec, err := base64.StdEncoding.DecodeString(message)
+	if err != nil {
+		return "", status.Errorf(codes.Internal, "Unable To Decode Phone No", err)
+	}
+	return string(sDec), nil
 }

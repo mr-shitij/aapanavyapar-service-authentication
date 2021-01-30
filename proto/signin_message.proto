@@ -14,23 +14,4 @@ message SignInForMailBaseResponse {
       ResponseData responseData = 10;
       ProblemCode code = 11;
     }
-    bool authorized = 51;
-}
-
-message SignInForPhoneBaseRequest {
-  string contact = 12;
-}
-
-message SignInForPhoneBaseResponse {
-  string tokenForOTP = 13;
-}
-
-message ValidateOTPForPhoneBaseRequest {
-  string tokenForOTP = 14;
-  string otp = 15;
-}
-
-message ValidateOTPForPhoneBaseResponse {
-  string token = 16;
-  string refreshToken = 17;
 }

@@ -6,7 +6,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"google.golang.org/grpc/codes"
-	status "google.golang.org/grpc/status"
+	"google.golang.org/grpc/status"
 	"io"
 	"os"
 	"strconv"
@@ -14,23 +14,22 @@ import (
 )
 
 const (
-	Validation5Min = time.Second * 5
+	Validation5Min  = time.Second * 5
 	Validation10Min = time.Second * 10
-	Validation5Hr = time.Second * 20
-	Validation12Hr = time.Second * 40
+	Validation5Hr   = time.Second * 20
+	Validation12Hr  = time.Second * 40
 )
-
 
 func (dataService *DataServices) GenerateAndSendOTP(ctx context.Context, userId string, phoneNo string, resendTime int32, validTime time.Duration) error {
 	otp := GenerateOTP()
-	fmt.Println("Sending The Generated OTP : " + otp + " to : ", phoneNo)
+	fmt.Println("Sending The Generated OTP : "+otp+" to : ", phoneNo)
 	data := &structs.OTPCashData{
 		OTP:         otp,
-		PhoneNo: phoneNo,
+		PhoneNo:     phoneNo,
 		ResendTimes: resendTime,
-		Time: time.Now(),
+		Time:        time.Now(),
 	}
-	err := dataService.Cash.Set(ctx, userId, data.Marshal(), validTime).Err()
+	err := dataService.SetDataToCash(ctx, userId, data.Marshal(), validTime)
 	if err != nil {
 		return status.Errorf(codes.Internal, "Unable To Cash OTP", err)
 	}
