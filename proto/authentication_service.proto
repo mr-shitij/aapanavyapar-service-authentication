@@ -6,12 +6,19 @@ import "signin_message.proto";
 import "signup_message.proto";
 import "token_message.proto";
 import "logout_message.proto";
+import "forget_password_message.proto";
 
 service Authentication {
   rpc Signup (SignUpRequest) returns (SignUpResponse);
-  rpc SignInWithMail (SignInForMailBaseRequest) returns (SignInForMailBaseResponse) {};
-  rpc GetNewToken (newTokenRequest) returns (newTokenResponse) {};
   rpc ContactConformation (ContactConformationRequest) returns (ContactConformationResponse) {};
   rpc ResendOTP (ResendOTPRequest) returns (ResendOTPResponse) {};
+
+  rpc GetNewToken (newTokenRequest) returns (newTokenResponse) {};
+  rpc SignInWithMail (SignInForMailBaseRequest) returns (SignInForMailBaseResponse) {};
   rpc Logout (LogoutRequest) returns (LogoutResponse) {};
+
+  rpc ForgetPassword (ForgetPasswordRequest) returns (ForgetPasswordResponse) {};
+  rpc ConformForgetPasswordOTP (ConformForgetPasswordOTPRequest) returns (ConformForgetPasswordOTPResponse) {};
+  rpc SetNewPassword (SetNewPasswordRequest) returns (SetNewPasswordResponse) {};
+
 }

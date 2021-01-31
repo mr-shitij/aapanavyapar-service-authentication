@@ -4,6 +4,7 @@ import (
 	"aapanavyapar_service_authentication/data_base/helpers"
 	"aapanavyapar_service_authentication/data_base/structs"
 	"context"
+	"fmt"
 	"github.com/go-redis/redis/v8"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -26,10 +27,12 @@ func (dataService *DataServices) LoadUserContactDataInCash(ctx context.Context) 
 			return status.Errorf(codes.Internal, "Unable To Structure Data : ", err)
 		}
 
-		err = dataService.SetContactListDataToCash(ctx, detail.PhoneNo, detail.Email)
+		err = dataService.SetContactListDataToCash(ctx, detail.PhoneNo, detail.UserId)
 		if err != nil {
 			return err
 		}
+
+		fmt.Println("Data : ", detail)
 
 	}
 
@@ -50,7 +53,7 @@ func (dataService *DataServices) GetTemporaryUserFromCash(ctx context.Context, i
 
 	val, err := dataService.GetDataFormCash(ctx, id+"_Temp")
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	data := structs.UserData{}
@@ -67,6 +70,10 @@ func (dataService *DataServices) GetContactListDataFormCash(ctx context.Context,
 	val, err = helpers.DecodePhoneNo(val)
 	if err != nil {
 		return "", err
+	}
+
+	if val == "" {
+		return "", status.Errorf(codes.NotFound, "No Data Found")
 	}
 
 	return val, nil

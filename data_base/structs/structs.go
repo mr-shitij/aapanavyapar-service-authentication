@@ -29,7 +29,7 @@ type OTPCashData struct {
 
 type UserContactDetails struct {
 	PhoneNo string `json:"phone_no" db:"phone_no"`
-	Email   string `json:"email" db:"email"`
+	UserId  string `json:"user_id" db:"user_id"`
 }
 
 func (m *RefreshTokenCashData) Marshal() []byte {

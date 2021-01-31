@@ -33,62 +33,91 @@ var file_authentication_service_proto_rawDesc = []byte{
 	0x73, 0x61, 0x67, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x13, 0x74, 0x6f, 0x6b, 0x65,
 	0x6e, 0x5f, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a,
 	0x14, 0x6c, 0x6f, 0x67, 0x6f, 0x75, 0x74, 0x5f, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x2e,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x32, 0xf3, 0x02, 0x0a, 0x0e, 0x41, 0x75, 0x74, 0x68, 0x65, 0x6e,
-	0x74, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x29, 0x0a, 0x06, 0x53, 0x69, 0x67, 0x6e,
-	0x75, 0x70, 0x12, 0x0e, 0x2e, 0x53, 0x69, 0x67, 0x6e, 0x55, 0x70, 0x52, 0x65, 0x71, 0x75, 0x65,
-	0x73, 0x74, 0x1a, 0x0f, 0x2e, 0x53, 0x69, 0x67, 0x6e, 0x55, 0x70, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x12, 0x49, 0x0a, 0x0e, 0x53, 0x69, 0x67, 0x6e, 0x49, 0x6e, 0x57, 0x69, 0x74,
-	0x68, 0x4d, 0x61, 0x69, 0x6c, 0x12, 0x19, 0x2e, 0x53, 0x69, 0x67, 0x6e, 0x49, 0x6e, 0x46, 0x6f,
-	0x72, 0x4d, 0x61, 0x69, 0x6c, 0x42, 0x61, 0x73, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
-	0x1a, 0x1a, 0x2e, 0x53, 0x69, 0x67, 0x6e, 0x49, 0x6e, 0x46, 0x6f, 0x72, 0x4d, 0x61, 0x69, 0x6c,
-	0x42, 0x61, 0x73, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x34,
-	0x0a, 0x0b, 0x47, 0x65, 0x74, 0x4e, 0x65, 0x77, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x12, 0x10, 0x2e,
-	0x6e, 0x65, 0x77, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
-	0x11, 0x2e, 0x6e, 0x65, 0x77, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
-	0x73, 0x65, 0x22, 0x00, 0x12, 0x52, 0x0a, 0x13, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x43,
-	0x6f, 0x6e, 0x66, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x1b, 0x2e, 0x43, 0x6f,
-	0x6e, 0x74, 0x61, 0x63, 0x74, 0x43, 0x6f, 0x6e, 0x66, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x69, 0x6f,
-	0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1c, 0x2e, 0x43, 0x6f, 0x6e, 0x74, 0x61,
-	0x63, 0x74, 0x43, 0x6f, 0x6e, 0x66, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x34, 0x0a, 0x09, 0x52, 0x65, 0x73, 0x65,
-	0x6e, 0x64, 0x4f, 0x54, 0x50, 0x12, 0x11, 0x2e, 0x52, 0x65, 0x73, 0x65, 0x6e, 0x64, 0x4f, 0x54,
-	0x50, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x12, 0x2e, 0x52, 0x65, 0x73, 0x65, 0x6e,
-	0x64, 0x4f, 0x54, 0x50, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x2b,
-	0x0a, 0x06, 0x4c, 0x6f, 0x67, 0x6f, 0x75, 0x74, 0x12, 0x0e, 0x2e, 0x4c, 0x6f, 0x67, 0x6f, 0x75,
-	0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x0f, 0x2e, 0x4c, 0x6f, 0x67, 0x6f, 0x75,
-	0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x06, 0x5a, 0x04, 0x2e,
-	0x3b, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1d, 0x66, 0x6f, 0x72, 0x67, 0x65, 0x74, 0x5f, 0x70, 0x61,
+	0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x5f, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x2e, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x32, 0xe0, 0x04, 0x0a, 0x0e, 0x41, 0x75, 0x74, 0x68, 0x65, 0x6e, 0x74,
+	0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x29, 0x0a, 0x06, 0x53, 0x69, 0x67, 0x6e, 0x75,
+	0x70, 0x12, 0x0e, 0x2e, 0x53, 0x69, 0x67, 0x6e, 0x55, 0x70, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x1a, 0x0f, 0x2e, 0x53, 0x69, 0x67, 0x6e, 0x55, 0x70, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x12, 0x52, 0x0a, 0x13, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x43, 0x6f, 0x6e,
+	0x66, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x1b, 0x2e, 0x43, 0x6f, 0x6e, 0x74,
+	0x61, 0x63, 0x74, 0x43, 0x6f, 0x6e, 0x66, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1c, 0x2e, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74,
+	0x43, 0x6f, 0x6e, 0x66, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x34, 0x0a, 0x09, 0x52, 0x65, 0x73, 0x65, 0x6e, 0x64,
+	0x4f, 0x54, 0x50, 0x12, 0x11, 0x2e, 0x52, 0x65, 0x73, 0x65, 0x6e, 0x64, 0x4f, 0x54, 0x50, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x12, 0x2e, 0x52, 0x65, 0x73, 0x65, 0x6e, 0x64, 0x4f,
+	0x54, 0x50, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x34, 0x0a, 0x0b,
+	0x47, 0x65, 0x74, 0x4e, 0x65, 0x77, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x12, 0x10, 0x2e, 0x6e, 0x65,
+	0x77, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x11, 0x2e,
+	0x6e, 0x65, 0x77, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x22, 0x00, 0x12, 0x49, 0x0a, 0x0e, 0x53, 0x69, 0x67, 0x6e, 0x49, 0x6e, 0x57, 0x69, 0x74, 0x68,
+	0x4d, 0x61, 0x69, 0x6c, 0x12, 0x19, 0x2e, 0x53, 0x69, 0x67, 0x6e, 0x49, 0x6e, 0x46, 0x6f, 0x72,
+	0x4d, 0x61, 0x69, 0x6c, 0x42, 0x61, 0x73, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
+	0x1a, 0x2e, 0x53, 0x69, 0x67, 0x6e, 0x49, 0x6e, 0x46, 0x6f, 0x72, 0x4d, 0x61, 0x69, 0x6c, 0x42,
+	0x61, 0x73, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x2b, 0x0a,
+	0x06, 0x4c, 0x6f, 0x67, 0x6f, 0x75, 0x74, 0x12, 0x0e, 0x2e, 0x4c, 0x6f, 0x67, 0x6f, 0x75, 0x74,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x0f, 0x2e, 0x4c, 0x6f, 0x67, 0x6f, 0x75, 0x74,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x43, 0x0a, 0x0e, 0x46, 0x6f,
+	0x72, 0x67, 0x65, 0x74, 0x50, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x12, 0x16, 0x2e, 0x46,
+	0x6f, 0x72, 0x67, 0x65, 0x74, 0x50, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x1a, 0x17, 0x2e, 0x46, 0x6f, 0x72, 0x67, 0x65, 0x74, 0x50, 0x61, 0x73,
+	0x73, 0x77, 0x6f, 0x72, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12,
+	0x61, 0x0a, 0x18, 0x43, 0x6f, 0x6e, 0x66, 0x6f, 0x72, 0x6d, 0x46, 0x6f, 0x72, 0x67, 0x65, 0x74,
+	0x50, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x4f, 0x54, 0x50, 0x12, 0x20, 0x2e, 0x43, 0x6f,
+	0x6e, 0x66, 0x6f, 0x72, 0x6d, 0x46, 0x6f, 0x72, 0x67, 0x65, 0x74, 0x50, 0x61, 0x73, 0x73, 0x77,
+	0x6f, 0x72, 0x64, 0x4f, 0x54, 0x50, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x21, 0x2e,
+	0x43, 0x6f, 0x6e, 0x66, 0x6f, 0x72, 0x6d, 0x46, 0x6f, 0x72, 0x67, 0x65, 0x74, 0x50, 0x61, 0x73,
+	0x73, 0x77, 0x6f, 0x72, 0x64, 0x4f, 0x54, 0x50, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x22, 0x00, 0x12, 0x43, 0x0a, 0x0e, 0x53, 0x65, 0x74, 0x4e, 0x65, 0x77, 0x50, 0x61, 0x73, 0x73,
+	0x77, 0x6f, 0x72, 0x64, 0x12, 0x16, 0x2e, 0x53, 0x65, 0x74, 0x4e, 0x65, 0x77, 0x50, 0x61, 0x73,
+	0x73, 0x77, 0x6f, 0x72, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x17, 0x2e, 0x53,
+	0x65, 0x74, 0x4e, 0x65, 0x77, 0x50, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x06, 0x5a, 0x04, 0x2e, 0x3b, 0x70, 0x62, 0x62,
+	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var file_authentication_service_proto_goTypes = []interface{}{
-	(*SignUpRequest)(nil),               // 0: SignUpRequest
-	(*SignInForMailBaseRequest)(nil),    // 1: SignInForMailBaseRequest
-	(*NewTokenRequest)(nil),             // 2: newTokenRequest
-	(*ContactConformationRequest)(nil),  // 3: ContactConformationRequest
-	(*ResendOTPRequest)(nil),            // 4: ResendOTPRequest
-	(*LogoutRequest)(nil),               // 5: LogoutRequest
-	(*SignUpResponse)(nil),              // 6: SignUpResponse
-	(*SignInForMailBaseResponse)(nil),   // 7: SignInForMailBaseResponse
-	(*NewTokenResponse)(nil),            // 8: newTokenResponse
-	(*ContactConformationResponse)(nil), // 9: ContactConformationResponse
-	(*ResendOTPResponse)(nil),           // 10: ResendOTPResponse
-	(*LogoutResponse)(nil),              // 11: LogoutResponse
+	(*SignUpRequest)(nil),                    // 0: SignUpRequest
+	(*ContactConformationRequest)(nil),       // 1: ContactConformationRequest
+	(*ResendOTPRequest)(nil),                 // 2: ResendOTPRequest
+	(*NewTokenRequest)(nil),                  // 3: newTokenRequest
+	(*SignInForMailBaseRequest)(nil),         // 4: SignInForMailBaseRequest
+	(*LogoutRequest)(nil),                    // 5: LogoutRequest
+	(*ForgetPasswordRequest)(nil),            // 6: ForgetPasswordRequest
+	(*ConformForgetPasswordOTPRequest)(nil),  // 7: ConformForgetPasswordOTPRequest
+	(*SetNewPasswordRequest)(nil),            // 8: SetNewPasswordRequest
+	(*SignUpResponse)(nil),                   // 9: SignUpResponse
+	(*ContactConformationResponse)(nil),      // 10: ContactConformationResponse
+	(*ResendOTPResponse)(nil),                // 11: ResendOTPResponse
+	(*NewTokenResponse)(nil),                 // 12: newTokenResponse
+	(*SignInForMailBaseResponse)(nil),        // 13: SignInForMailBaseResponse
+	(*LogoutResponse)(nil),                   // 14: LogoutResponse
+	(*ForgetPasswordResponse)(nil),           // 15: ForgetPasswordResponse
+	(*ConformForgetPasswordOTPResponse)(nil), // 16: ConformForgetPasswordOTPResponse
+	(*SetNewPasswordResponse)(nil),           // 17: SetNewPasswordResponse
 }
 var file_authentication_service_proto_depIdxs = []int32{
 	0,  // 0: Authentication.Signup:input_type -> SignUpRequest
-	1,  // 1: Authentication.SignInWithMail:input_type -> SignInForMailBaseRequest
-	2,  // 2: Authentication.GetNewToken:input_type -> newTokenRequest
-	3,  // 3: Authentication.ContactConformation:input_type -> ContactConformationRequest
-	4,  // 4: Authentication.ResendOTP:input_type -> ResendOTPRequest
+	1,  // 1: Authentication.ContactConformation:input_type -> ContactConformationRequest
+	2,  // 2: Authentication.ResendOTP:input_type -> ResendOTPRequest
+	3,  // 3: Authentication.GetNewToken:input_type -> newTokenRequest
+	4,  // 4: Authentication.SignInWithMail:input_type -> SignInForMailBaseRequest
 	5,  // 5: Authentication.Logout:input_type -> LogoutRequest
-	6,  // 6: Authentication.Signup:output_type -> SignUpResponse
-	7,  // 7: Authentication.SignInWithMail:output_type -> SignInForMailBaseResponse
-	8,  // 8: Authentication.GetNewToken:output_type -> newTokenResponse
-	9,  // 9: Authentication.ContactConformation:output_type -> ContactConformationResponse
-	10, // 10: Authentication.ResendOTP:output_type -> ResendOTPResponse
-	11, // 11: Authentication.Logout:output_type -> LogoutResponse
-	6,  // [6:12] is the sub-list for method output_type
-	0,  // [0:6] is the sub-list for method input_type
+	6,  // 6: Authentication.ForgetPassword:input_type -> ForgetPasswordRequest
+	7,  // 7: Authentication.ConformForgetPasswordOTP:input_type -> ConformForgetPasswordOTPRequest
+	8,  // 8: Authentication.SetNewPassword:input_type -> SetNewPasswordRequest
+	9,  // 9: Authentication.Signup:output_type -> SignUpResponse
+	10, // 10: Authentication.ContactConformation:output_type -> ContactConformationResponse
+	11, // 11: Authentication.ResendOTP:output_type -> ResendOTPResponse
+	12, // 12: Authentication.GetNewToken:output_type -> newTokenResponse
+	13, // 13: Authentication.SignInWithMail:output_type -> SignInForMailBaseResponse
+	14, // 14: Authentication.Logout:output_type -> LogoutResponse
+	15, // 15: Authentication.ForgetPassword:output_type -> ForgetPasswordResponse
+	16, // 16: Authentication.ConformForgetPasswordOTP:output_type -> ConformForgetPasswordOTPResponse
+	17, // 17: Authentication.SetNewPassword:output_type -> SetNewPasswordResponse
+	9,  // [9:18] is the sub-list for method output_type
+	0,  // [0:9] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name
@@ -103,6 +132,7 @@ func file_authentication_service_proto_init() {
 	file_signup_message_proto_init()
 	file_token_message_proto_init()
 	file_logout_message_proto_init()
+	file_forget_password_message_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
@@ -135,11 +165,14 @@ const _ = grpc.SupportPackageIsVersion6
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type AuthenticationClient interface {
 	Signup(ctx context.Context, in *SignUpRequest, opts ...grpc.CallOption) (*SignUpResponse, error)
-	SignInWithMail(ctx context.Context, in *SignInForMailBaseRequest, opts ...grpc.CallOption) (*SignInForMailBaseResponse, error)
-	GetNewToken(ctx context.Context, in *NewTokenRequest, opts ...grpc.CallOption) (*NewTokenResponse, error)
 	ContactConformation(ctx context.Context, in *ContactConformationRequest, opts ...grpc.CallOption) (*ContactConformationResponse, error)
 	ResendOTP(ctx context.Context, in *ResendOTPRequest, opts ...grpc.CallOption) (*ResendOTPResponse, error)
+	GetNewToken(ctx context.Context, in *NewTokenRequest, opts ...grpc.CallOption) (*NewTokenResponse, error)
+	SignInWithMail(ctx context.Context, in *SignInForMailBaseRequest, opts ...grpc.CallOption) (*SignInForMailBaseResponse, error)
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error)
+	ForgetPassword(ctx context.Context, in *ForgetPasswordRequest, opts ...grpc.CallOption) (*ForgetPasswordResponse, error)
+	ConformForgetPasswordOTP(ctx context.Context, in *ConformForgetPasswordOTPRequest, opts ...grpc.CallOption) (*ConformForgetPasswordOTPResponse, error)
+	SetNewPassword(ctx context.Context, in *SetNewPasswordRequest, opts ...grpc.CallOption) (*SetNewPasswordResponse, error)
 }
 
 type authenticationClient struct {
@@ -153,24 +186,6 @@ func NewAuthenticationClient(cc grpc.ClientConnInterface) AuthenticationClient {
 func (c *authenticationClient) Signup(ctx context.Context, in *SignUpRequest, opts ...grpc.CallOption) (*SignUpResponse, error) {
 	out := new(SignUpResponse)
 	err := c.cc.Invoke(ctx, "/Authentication/Signup", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *authenticationClient) SignInWithMail(ctx context.Context, in *SignInForMailBaseRequest, opts ...grpc.CallOption) (*SignInForMailBaseResponse, error) {
-	out := new(SignInForMailBaseResponse)
-	err := c.cc.Invoke(ctx, "/Authentication/SignInWithMail", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *authenticationClient) GetNewToken(ctx context.Context, in *NewTokenRequest, opts ...grpc.CallOption) (*NewTokenResponse, error) {
-	out := new(NewTokenResponse)
-	err := c.cc.Invoke(ctx, "/Authentication/GetNewToken", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -195,6 +210,24 @@ func (c *authenticationClient) ResendOTP(ctx context.Context, in *ResendOTPReque
 	return out, nil
 }
 
+func (c *authenticationClient) GetNewToken(ctx context.Context, in *NewTokenRequest, opts ...grpc.CallOption) (*NewTokenResponse, error) {
+	out := new(NewTokenResponse)
+	err := c.cc.Invoke(ctx, "/Authentication/GetNewToken", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authenticationClient) SignInWithMail(ctx context.Context, in *SignInForMailBaseRequest, opts ...grpc.CallOption) (*SignInForMailBaseResponse, error) {
+	out := new(SignInForMailBaseResponse)
+	err := c.cc.Invoke(ctx, "/Authentication/SignInWithMail", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *authenticationClient) Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error) {
 	out := new(LogoutResponse)
 	err := c.cc.Invoke(ctx, "/Authentication/Logout", in, out, opts...)
@@ -204,14 +237,44 @@ func (c *authenticationClient) Logout(ctx context.Context, in *LogoutRequest, op
 	return out, nil
 }
 
+func (c *authenticationClient) ForgetPassword(ctx context.Context, in *ForgetPasswordRequest, opts ...grpc.CallOption) (*ForgetPasswordResponse, error) {
+	out := new(ForgetPasswordResponse)
+	err := c.cc.Invoke(ctx, "/Authentication/ForgetPassword", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authenticationClient) ConformForgetPasswordOTP(ctx context.Context, in *ConformForgetPasswordOTPRequest, opts ...grpc.CallOption) (*ConformForgetPasswordOTPResponse, error) {
+	out := new(ConformForgetPasswordOTPResponse)
+	err := c.cc.Invoke(ctx, "/Authentication/ConformForgetPasswordOTP", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authenticationClient) SetNewPassword(ctx context.Context, in *SetNewPasswordRequest, opts ...grpc.CallOption) (*SetNewPasswordResponse, error) {
+	out := new(SetNewPasswordResponse)
+	err := c.cc.Invoke(ctx, "/Authentication/SetNewPassword", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthenticationServer is the server API for Authentication service.
 type AuthenticationServer interface {
 	Signup(context.Context, *SignUpRequest) (*SignUpResponse, error)
-	SignInWithMail(context.Context, *SignInForMailBaseRequest) (*SignInForMailBaseResponse, error)
-	GetNewToken(context.Context, *NewTokenRequest) (*NewTokenResponse, error)
 	ContactConformation(context.Context, *ContactConformationRequest) (*ContactConformationResponse, error)
 	ResendOTP(context.Context, *ResendOTPRequest) (*ResendOTPResponse, error)
+	GetNewToken(context.Context, *NewTokenRequest) (*NewTokenResponse, error)
+	SignInWithMail(context.Context, *SignInForMailBaseRequest) (*SignInForMailBaseResponse, error)
 	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
+	ForgetPassword(context.Context, *ForgetPasswordRequest) (*ForgetPasswordResponse, error)
+	ConformForgetPasswordOTP(context.Context, *ConformForgetPasswordOTPRequest) (*ConformForgetPasswordOTPResponse, error)
+	SetNewPassword(context.Context, *SetNewPasswordRequest) (*SetNewPasswordResponse, error)
 }
 
 // UnimplementedAuthenticationServer can be embedded to have forward compatible implementations.
@@ -221,20 +284,29 @@ type UnimplementedAuthenticationServer struct {
 func (*UnimplementedAuthenticationServer) Signup(context.Context, *SignUpRequest) (*SignUpResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Signup not implemented")
 }
-func (*UnimplementedAuthenticationServer) SignInWithMail(context.Context, *SignInForMailBaseRequest) (*SignInForMailBaseResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SignInWithMail not implemented")
-}
-func (*UnimplementedAuthenticationServer) GetNewToken(context.Context, *NewTokenRequest) (*NewTokenResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetNewToken not implemented")
-}
 func (*UnimplementedAuthenticationServer) ContactConformation(context.Context, *ContactConformationRequest) (*ContactConformationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ContactConformation not implemented")
 }
 func (*UnimplementedAuthenticationServer) ResendOTP(context.Context, *ResendOTPRequest) (*ResendOTPResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ResendOTP not implemented")
 }
+func (*UnimplementedAuthenticationServer) GetNewToken(context.Context, *NewTokenRequest) (*NewTokenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNewToken not implemented")
+}
+func (*UnimplementedAuthenticationServer) SignInWithMail(context.Context, *SignInForMailBaseRequest) (*SignInForMailBaseResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SignInWithMail not implemented")
+}
 func (*UnimplementedAuthenticationServer) Logout(context.Context, *LogoutRequest) (*LogoutResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Logout not implemented")
+}
+func (*UnimplementedAuthenticationServer) ForgetPassword(context.Context, *ForgetPasswordRequest) (*ForgetPasswordResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ForgetPassword not implemented")
+}
+func (*UnimplementedAuthenticationServer) ConformForgetPasswordOTP(context.Context, *ConformForgetPasswordOTPRequest) (*ConformForgetPasswordOTPResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConformForgetPasswordOTP not implemented")
+}
+func (*UnimplementedAuthenticationServer) SetNewPassword(context.Context, *SetNewPasswordRequest) (*SetNewPasswordResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetNewPassword not implemented")
 }
 
 func RegisterAuthenticationServer(s *grpc.Server, srv AuthenticationServer) {
@@ -255,42 +327,6 @@ func _Authentication_Signup_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthenticationServer).Signup(ctx, req.(*SignUpRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Authentication_SignInWithMail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SignInForMailBaseRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AuthenticationServer).SignInWithMail(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/Authentication/SignInWithMail",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthenticationServer).SignInWithMail(ctx, req.(*SignInForMailBaseRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Authentication_GetNewToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(NewTokenRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AuthenticationServer).GetNewToken(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/Authentication/GetNewToken",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthenticationServer).GetNewToken(ctx, req.(*NewTokenRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -331,6 +367,42 @@ func _Authentication_ResendOTP_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Authentication_GetNewToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NewTokenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticationServer).GetNewToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Authentication/GetNewToken",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticationServer).GetNewToken(ctx, req.(*NewTokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Authentication_SignInWithMail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SignInForMailBaseRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticationServer).SignInWithMail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Authentication/SignInWithMail",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticationServer).SignInWithMail(ctx, req.(*SignInForMailBaseRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Authentication_Logout_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(LogoutRequest)
 	if err := dec(in); err != nil {
@@ -349,6 +421,60 @@ func _Authentication_Logout_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Authentication_ForgetPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ForgetPasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticationServer).ForgetPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Authentication/ForgetPassword",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticationServer).ForgetPassword(ctx, req.(*ForgetPasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Authentication_ConformForgetPasswordOTP_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ConformForgetPasswordOTPRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticationServer).ConformForgetPasswordOTP(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Authentication/ConformForgetPasswordOTP",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticationServer).ConformForgetPasswordOTP(ctx, req.(*ConformForgetPasswordOTPRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Authentication_SetNewPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetNewPasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticationServer).SetNewPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Authentication/SetNewPassword",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticationServer).SetNewPassword(ctx, req.(*SetNewPasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Authentication_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "Authentication",
 	HandlerType: (*AuthenticationServer)(nil),
@@ -356,14 +482,6 @@ var _Authentication_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Signup",
 			Handler:    _Authentication_Signup_Handler,
-		},
-		{
-			MethodName: "SignInWithMail",
-			Handler:    _Authentication_SignInWithMail_Handler,
-		},
-		{
-			MethodName: "GetNewToken",
-			Handler:    _Authentication_GetNewToken_Handler,
 		},
 		{
 			MethodName: "ContactConformation",
@@ -374,8 +492,28 @@ var _Authentication_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Authentication_ResendOTP_Handler,
 		},
 		{
+			MethodName: "GetNewToken",
+			Handler:    _Authentication_GetNewToken_Handler,
+		},
+		{
+			MethodName: "SignInWithMail",
+			Handler:    _Authentication_SignInWithMail_Handler,
+		},
+		{
 			MethodName: "Logout",
 			Handler:    _Authentication_Logout_Handler,
+		},
+		{
+			MethodName: "ForgetPassword",
+			Handler:    _Authentication_ForgetPassword_Handler,
+		},
+		{
+			MethodName: "ConformForgetPasswordOTP",
+			Handler:    _Authentication_ConformForgetPasswordOTP_Handler,
+		},
+		{
+			MethodName: "SetNewPassword",
+			Handler:    _Authentication_SetNewPassword_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -21,9 +21,17 @@ type AuthenticationServer struct {
 }
 
 func NewAuthenticationServer() (*AuthenticationServer, error) {
-	return &AuthenticationServer{
+
+	auth := &AuthenticationServer{
 		data: data_services.NewDbConnection(),
-	}, nil
+	}
+	err := auth.data.LoadUserContactDataInCash(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println("Cash Data Is Loaded : ")
+
+	return auth, nil
 }
 
 func PrintClaimsOfAuthToken(token string) {
@@ -67,12 +75,13 @@ func PrintClaimsOfRefreshToken(token string) {
 }
 
 func (authenticationServer *AuthenticationServer) GetNewToken(ctx context.Context, request *pb.NewTokenRequest) (*pb.NewTokenResponse, error) {
-	existingRefreshToken := request.GetRefreshToken()
-	if existingRefreshToken == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "No Refresh Token Is Specified")
+
+	receivedRefreshToken, err := authenticationServer.data.ValidateToken(ctx, request.GetRefreshToken(), os.Getenv("REFRESH_TOKEN_SECRETE"), data_services.GetNewToken)
+	if err != nil {
+		return nil, err
 	}
 
-	ok, token, err := authenticationServer.data.ValidateRefreshTokenAndGenerateNewAuthToken(ctx, existingRefreshToken)
+	ok, token, err := authenticationServer.data.ValidateRefreshTokenAndGenerateNewAuthToken(ctx, request.GetRefreshToken(), receivedRefreshToken)
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +185,7 @@ func (authenticationServer *AuthenticationServer) Signup(ctx context.Context, re
 		return nil, err
 	}
 
-	refreshToken, authToken, err := authenticationServer.data.GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx, userId.String(), false)
+	refreshToken, authToken, err := authenticationServer.data.GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx, userId.String(), false, []int{data_services.GetNewToken, data_services.ResendOTP, data_services.ConformContact, data_services.LogOut})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Unable To Generate Refresh Token", err)
 	}
@@ -261,7 +270,7 @@ func (authenticationServer *AuthenticationServer) SignInWithMail(ctx context.Con
 		return nil, status.Errorf(codes.Unknown, "Unable To Authenticate", err)
 	}
 
-	refreshToken, authToken, err := authenticationServer.data.GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx, userId, true)
+	refreshToken, authToken, err := authenticationServer.data.GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx, userId, true, []int{data_services.LogOut, data_services.GetNewToken, data_services.External})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Unable To Generate Refresh Token", err)
 	}
@@ -278,7 +287,7 @@ func (authenticationServer *AuthenticationServer) SignInWithMail(ctx context.Con
 }
 
 func (authenticationServer *AuthenticationServer) Logout(ctx context.Context, request *pb.LogoutRequest) (*pb.LogoutResponse, error) {
-	token, err := authenticationServer.data.ValidateToken(ctx, request.GetToken(), os.Getenv("AUTH_TOKEN_SECRETE"))
+	token, err := authenticationServer.data.ValidateToken(ctx, request.GetToken(), os.Getenv("AUTH_TOKEN_SECRETE"), data_services.LogOut)
 	if err != nil {
 		return &pb.LogoutResponse{Status: false}, err
 	}
@@ -291,7 +300,7 @@ func (authenticationServer *AuthenticationServer) Logout(ctx context.Context, re
 }
 
 func (authenticationServer *AuthenticationServer) ContactConformation(ctx context.Context, request *pb.ContactConformationRequest) (*pb.ContactConformationResponse, error) {
-	token, err := authenticationServer.data.ValidateToken(ctx, request.GetToken(), os.Getenv("AUTH_TOKEN_SECRETE"))
+	token, err := authenticationServer.data.ValidateToken(ctx, request.GetToken(), os.Getenv("AUTH_TOKEN_SECRETE"), data_services.ConformContact)
 	if err != nil {
 		return nil, err
 	}
@@ -339,7 +348,7 @@ func (authenticationServer *AuthenticationServer) ContactConformation(ctx contex
 		}
 		fmt.Println("Token From Cash Delete ", err)
 
-		refreshTok, authTok, err := authenticationServer.data.GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx, token.Audience, true)
+		refreshTok, authTok, err := authenticationServer.data.GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx, token.Audience, true, []int{data_services.LogOut, data_services.GetNewToken, data_services.External})
 		if err != nil {
 			return nil, err
 		}
@@ -354,7 +363,7 @@ func (authenticationServer *AuthenticationServer) ContactConformation(ctx contex
 }
 
 func (authenticationServer *AuthenticationServer) ResendOTP(ctx context.Context, request *pb.ResendOTPRequest) (*pb.ResendOTPResponse, error) {
-	token, err := authenticationServer.data.ValidateToken(ctx, request.GetToken(), os.Getenv("AUTH_TOKEN_SECRETE"))
+	token, err := authenticationServer.data.ValidateToken(ctx, request.GetToken(), os.Getenv("AUTH_TOKEN_SECRETE"), data_services.ResendOTP)
 	if err != nil {
 		return nil, err
 	}
@@ -465,4 +474,134 @@ func (authenticationServer *AuthenticationServer) ResendOTP(ctx context.Context,
 
 	}
 	return nil, status.Errorf(codes.Unknown, "Unable To Process Request")
+}
+
+func (authenticationServer *AuthenticationServer) ForgetPassword(ctx context.Context, request *pb.ForgetPasswordRequest) (*pb.ForgetPasswordResponse, error) {
+	phoNo, err := helpers.SanitizeAndValidatePhoneNumber(request.GetPhoNo())
+	if err != nil {
+		return nil, err
+	}
+
+	id, err := authenticationServer.data.GetContactListDataFormCash(ctx, phoNo)
+	if err != nil {
+		return &pb.ForgetPasswordResponse{
+			Data: &pb.ForgetPasswordResponse_Code{
+				Code: pb.ProblemCode_UserNotExist,
+			},
+		}, nil
+	}
+	refreshToken, authToken, err := authenticationServer.data.GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx, id, false, []int{data_services.GetNewToken, data_services.ResendOTP, data_services.ForgetPassword})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Unable To Generate Refresh Token", err)
+	}
+
+	err = authenticationServer.data.GenerateAndSendOTP(ctx, id, phoNo, 0, data_services.Validation5Min)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.ForgetPasswordResponse{
+		Data: &pb.ForgetPasswordResponse_ResponseData{
+			ResponseData: &pb.ResponseData{
+				Token:        authToken,
+				RefreshToken: refreshToken,
+			},
+		},
+	}, nil
+}
+
+func (authenticationServer *AuthenticationServer) ConformForgetPasswordOTP(ctx context.Context, request *pb.ConformForgetPasswordOTPRequest) (*pb.ConformForgetPasswordOTPResponse, error) {
+	token, err := authenticationServer.data.ValidateToken(ctx, request.GetToken(), os.Getenv("AUTH_TOKEN_SECRETE"), data_services.ForgetPassword)
+	if err != nil {
+		return nil, err
+	}
+
+	var authorized bool
+	if err = token.Get("authorized", &authorized); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid Token", err)
+	}
+	if authorized {
+		return nil, status.Errorf(codes.AlreadyExists, "Invalid Token")
+	}
+
+	cashVal, err := authenticationServer.data.GetDataFormCash(ctx, token.Audience)
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println("Val : ", cashVal)
+	fmt.Println("Requested OTP : ", request.GetOtp())
+
+	var val structs.OTPCashData
+	structs.UnmarshalOTPCash([]byte(cashVal), &val)
+
+	if val.OTP == request.GetOtp() {
+
+		err = authenticationServer.data.DelDataFormCash(ctx, token.Subject)
+		if err != nil {
+			return nil, err
+		}
+		fmt.Println("Refresh From Cash Delete ", err)
+
+		err = authenticationServer.data.DelDataFormCash(ctx, token.Audience)
+		if err != nil {
+			return nil, err
+		}
+		fmt.Println("Token From Cash Delete ", err)
+
+		passToken, err := authenticationServer.data.GeneratePassTokenAndAddToCash(ctx, token.Audience, []int{data_services.NewPassToken})
+		if err != nil {
+			return nil, err
+		}
+
+		return &pb.ConformForgetPasswordOTPResponse{
+			NewPassToken: passToken,
+		}, nil
+
+	}
+
+	err = authenticationServer.data.DelDataFormCash(ctx, token.Subject)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println("Refresh From Cash Delete ", err)
+
+	err = authenticationServer.data.DelDataFormCash(ctx, token.Audience)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println("Token From Cash Delete ", err)
+
+	return nil, status.Errorf(codes.PermissionDenied, "Invalid OTP To Get Password")
+
+}
+
+func (authenticationServer *AuthenticationServer) SetNewPassword(ctx context.Context, request *pb.SetNewPasswordRequest) (*pb.SetNewPasswordResponse, error) {
+	token, err := authenticationServer.data.ValidateToken(ctx, request.GetNewPassToken(), os.Getenv("PASS_TOKEN_SECRETE"), data_services.NewPassToken)
+	if err != nil {
+		return &pb.SetNewPasswordResponse{Status: false}, err
+	}
+
+	var authorized bool
+	if err = token.Get("authorized", &authorized); err != nil {
+		return &pb.SetNewPasswordResponse{Status: false}, status.Errorf(codes.InvalidArgument, "Invalid Token", err)
+	}
+	if !authorized {
+		err = authenticationServer.data.DelDataFormCash(ctx, token.Subject)
+		if err != nil {
+			return &pb.SetNewPasswordResponse{Status: false}, err
+		}
+		return &pb.SetNewPasswordResponse{Status: false}, status.Errorf(codes.AlreadyExists, "Invalid Token")
+	}
+
+	password, err := helpers.SanitizeAndValidatePassword(request.GetNewPassword())
+	if err != nil {
+		return &pb.SetNewPasswordResponse{Status: false}, err
+	}
+
+	err = authenticationServer.data.UpdatePassword(token.Audience, password)
+	if err != nil {
+		return &pb.SetNewPasswordResponse{Status: false}, err
+	}
+	return &pb.SetNewPasswordResponse{Status: true}, nil
 }

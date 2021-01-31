@@ -32,12 +32,6 @@ message ContactConformationResponse {
   string refreshToken = 36;
 }
 
-enum OTPResponse{
-  OK = 0;
-  NotOk = 1;
-}
-
-
 message ResendOTPRequest {
   string token = 54;
 }

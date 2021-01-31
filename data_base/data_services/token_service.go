@@ -21,9 +21,11 @@ const (
 	MaxTokenAttemptForUnAuthorized    = 7
 	RefreshTokenExpiryForUnAuthorized = time.Minute * 30 // 1/2 hours
 	AuthTokenExpiryForUnAuthorized    = time.Minute * 5  // 5 minutes
+
+	PassTokenExpiry = time.Minute * 5
 )
 
-func GenerateRefreshToken(userId string, authorized bool) (string, string, error) {
+func GenerateRefreshToken(userId string, authorized bool, accessGroup []int) (string, string, error) {
 
 	now := time.Now()
 
@@ -49,6 +51,7 @@ func GenerateRefreshToken(userId string, authorized bool) (string, string, error
 		NotBefore:  nbt,
 	}
 	jsonToken.Set("authorized", authorized)
+	jsonToken.Set("accessGroup", accessGroup)
 	footer := "Powered By AapanaVypar"
 
 	// Encrypt data
@@ -61,9 +64,42 @@ func GenerateRefreshToken(userId string, authorized bool) (string, string, error
 	return token, refreshTokenId.String(), nil
 }
 
-func (dataService *DataServices) GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx context.Context, userId string, authorized bool) (string, string, error) {
+func GeneratePassToken(userId string, accessGroup []int) (string, string, error) {
 
-	token, refreshTokenId, err := GenerateRefreshToken(userId, authorized)
+	now := time.Now()
+	exp := now.Add(PassTokenExpiry)
+	nbt := now
+
+	passTokenId, err := uuid.NewRandom()
+	if err != nil {
+		return "", "", status.Errorf(codes.Internal, "can not generate internal uuid  : %w", err)
+	}
+
+	jsonToken := paseto.JSONToken{
+		Audience:   userId,
+		Subject:    passTokenId.String(),
+		Issuer:     os.Getenv("TOKEN_ISSUER"),
+		IssuedAt:   now,
+		Expiration: exp,
+		NotBefore:  nbt,
+	}
+	jsonToken.Set("authorized", true)
+	jsonToken.Set("accessGroup", accessGroup)
+	footer := "Powered By AapanaVypar"
+
+	// Encrypt data
+	token, err := paseto.Encrypt([]byte(os.Getenv("PASS_TOKEN_SECRETE")), jsonToken, footer)
+
+	if err != nil {
+		return "", "", status.Errorf(codes.Internal, "unable to encrypt token  : %w", err)
+	}
+
+	return token, passTokenId.String(), nil
+}
+
+func (dataService *DataServices) GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx context.Context, userId string, authorized bool, accessGroup []int) (string, string, error) {
+
+	token, refreshTokenId, err := GenerateRefreshToken(userId, authorized, accessGroup)
 
 	cashData := structs.RefreshTokenCashData{
 		RefreshToken:   token,
@@ -80,7 +116,7 @@ func (dataService *DataServices) GenerateRefreshAndAuthTokenAndAddRefreshToCash(
 		return "", "", err
 	}
 
-	authToken, err := GenerateAuthToken(userId, refreshTokenId, authorized)
+	authToken, err := GenerateAuthToken(userId, refreshTokenId, authorized, accessGroup)
 
 	if err != nil {
 		return "", "", status.Errorf(codes.Internal, "unable to create auth token  : %w", err)
@@ -89,12 +125,27 @@ func (dataService *DataServices) GenerateRefreshAndAuthTokenAndAddRefreshToCash(
 	return token, authToken, nil
 }
 
-func (dataService *DataServices) ValidateRefreshTokenAndGenerateNewAuthToken(ctx context.Context, tokenString string) (bool, string, error) {
+func (dataService *DataServices) GeneratePassTokenAndAddToCash(ctx context.Context, userId string, accessGroup []int) (string, error) {
 
-	receivedRefreshToken, err := dataService.ValidateToken(ctx, tokenString, os.Getenv("REFRESH_TOKEN_SECRETE"))
+	token, passTokenId, err := GeneratePassToken(userId, accessGroup)
 	if err != nil {
-		return false, "", err
+		return "", err
 	}
+
+	cashData := structs.RefreshTokenCashData{
+		RefreshToken:   token,
+		AllocatedToken: 0,
+	}
+
+	err = dataService.SetDataToCash(ctx, passTokenId, cashData.Marshal(), PassTokenExpiry)
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
+}
+
+func (dataService *DataServices) ValidateRefreshTokenAndGenerateNewAuthToken(ctx context.Context, tokenString string, receivedRefreshToken *paseto.JSONToken) (bool, string, error) {
 
 	val, err := dataService.GetDataFormCash(ctx, receivedRefreshToken.Subject)
 	if err != nil {
@@ -121,16 +172,14 @@ func (dataService *DataServices) ValidateRefreshTokenAndGenerateNewAuthToken(ctx
 		return false, "", err
 	}
 
-	// Note Update Cash When the user validates his contact number
-	//
-	//if !authorized {
-	//	authorized, err = dataService.IsUserAuthorized(receivedRefreshToken.Audience)
-	//	if err != nil {
-	//		return false, "", status.Errorf(codes.Internal, "Error while authorizing token %v", err)
-	//	}
-	//}
+	var accessGroup []int
+	err = receivedRefreshToken.Get("accessGroup", &accessGroup)
+	fmt.Println("Access Group  : ", accessGroup)
+	if err != nil {
+		return false, "", status.Errorf(codes.PermissionDenied, "Token Is Not Valid %v", err)
+	}
 
-	token, err := GenerateAuthToken(receivedRefreshToken.Audience, receivedRefreshToken.Subject, authorized)
+	token, err := GenerateAuthToken(receivedRefreshToken.Audience, receivedRefreshToken.Subject, authorized, accessGroup)
 	if err != nil {
 		return false, "", status.Errorf(codes.Internal, "Unable To Create The Token %v", err)
 	}
@@ -155,7 +204,7 @@ func (dataService *DataServices) ValidateRefreshTokenAndGenerateNewAuthToken(ctx
 	return true, token, nil
 }
 
-func GenerateAuthToken(userId string, refreshTokenId string, authorized bool) (string, error) {
+func GenerateAuthToken(userId string, refreshTokenId string, authorized bool, accessGroup []int) (string, error) {
 
 	now := time.Now()
 	var exp time.Time
@@ -175,6 +224,7 @@ func GenerateAuthToken(userId string, refreshTokenId string, authorized bool) (s
 		NotBefore:  nbt,
 	}
 	jsonToken.Set("authorized", authorized)
+	jsonToken.Set("accessGroup", accessGroup)
 	footer := "Powered By AapanaVypar"
 
 	// Encrypt data
@@ -186,7 +236,7 @@ func GenerateAuthToken(userId string, refreshTokenId string, authorized bool) (s
 	return token, nil
 }
 
-func (dataService *DataServices) ValidateToken(ctx context.Context, tokenString, key string) (*paseto.JSONToken, error) {
+func (dataService *DataServices) ValidateToken(ctx context.Context, tokenString, key string, access int) (*paseto.JSONToken, error) {
 	var receivedToken paseto.JSONToken
 	var newFooter string
 	err := paseto.Decrypt(tokenString, []byte(key), &receivedToken, &newFooter)
@@ -201,6 +251,17 @@ func (dataService *DataServices) ValidateToken(ctx context.Context, tokenString,
 	)
 	if err != nil {
 		return nil, status.Errorf(codes.PermissionDenied, "Invalid Token %v", err)
+	}
+
+	var accessGroup []int
+	err = receivedToken.Get("accessGroup", &accessGroup)
+	fmt.Println("Access Group  : ", accessGroup)
+	if err != nil {
+		return nil, status.Errorf(codes.PermissionDenied, "Token Is Not Valid %v", err)
+	}
+
+	if !IsHasAccessTo(accessGroup, access) {
+		return nil, status.Errorf(codes.PermissionDenied, "Token Does Not Have Valid Permission To Access Resources %v", err)
 	}
 
 	_, err = uuid.Parse(receivedToken.Subject)

@@ -21,52 +21,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type OTPResponse int32
-
-const (
-	OTPResponse_OK    OTPResponse = 0
-	OTPResponse_NotOk OTPResponse = 1
-)
-
-// Enum value maps for OTPResponse.
-var (
-	OTPResponse_name = map[int32]string{
-		0: "OK",
-		1: "NotOk",
-	}
-	OTPResponse_value = map[string]int32{
-		"OK":    0,
-		"NotOk": 1,
-	}
-)
-
-func (x OTPResponse) Enum() *OTPResponse {
-	p := new(OTPResponse)
-	*p = x
-	return p
-}
-
-func (x OTPResponse) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (OTPResponse) Descriptor() protoreflect.EnumDescriptor {
-	return file_signup_message_proto_enumTypes[0].Descriptor()
-}
-
-func (OTPResponse) Type() protoreflect.EnumType {
-	return &file_signup_message_proto_enumTypes[0]
-}
-
-func (x OTPResponse) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use OTPResponse.Descriptor instead.
-func (OTPResponse) EnumDescriptor() ([]byte, []int) {
-	return file_signup_message_proto_rawDescGZIP(), []int{0}
-}
-
 type SignUpRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -436,7 +390,7 @@ func (x *ResendOTPResponse) GetResponse() OTPResponse {
 	if x != nil {
 		return x.Response
 	}
-	return OTPResponse_OK
+	return OTPResponse_NotOk
 }
 
 func (x *ResendOTPResponse) GetTimeToWaitForNextRequest() *duration.Duration {
@@ -494,10 +448,8 @@ var file_signup_message_proto_rawDesc = []byte{
 	0x19, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75,
 	0x66, 0x2e, 0x44, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x18, 0x74, 0x69, 0x6d, 0x65,
 	0x54, 0x6f, 0x57, 0x61, 0x69, 0x74, 0x46, 0x6f, 0x72, 0x4e, 0x65, 0x78, 0x74, 0x52, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x2a, 0x20, 0x0a, 0x0b, 0x4f, 0x54, 0x50, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x12, 0x06, 0x0a, 0x02, 0x4f, 0x4b, 0x10, 0x00, 0x12, 0x09, 0x0a, 0x05, 0x4e,
-	0x6f, 0x74, 0x4f, 0x6b, 0x10, 0x01, 0x42, 0x06, 0x5a, 0x04, 0x2e, 0x3b, 0x70, 0x62, 0x62, 0x06,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x75, 0x65, 0x73, 0x74, 0x42, 0x06, 0x5a, 0x04, 0x2e, 0x3b, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -512,24 +464,23 @@ func file_signup_message_proto_rawDescGZIP() []byte {
 	return file_signup_message_proto_rawDescData
 }
 
-var file_signup_message_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_signup_message_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_signup_message_proto_goTypes = []interface{}{
-	(OTPResponse)(0),                    // 0: OTPResponse
-	(*SignUpRequest)(nil),               // 1: SignUpRequest
-	(*SignUpResponse)(nil),              // 2: SignUpResponse
-	(*ContactConformationRequest)(nil),  // 3: ContactConformationRequest
-	(*ContactConformationResponse)(nil), // 4: ContactConformationResponse
-	(*ResendOTPRequest)(nil),            // 5: ResendOTPRequest
-	(*ResendOTPResponse)(nil),           // 6: ResendOTPResponse
-	(*ResponseData)(nil),                // 7: ResponseData
-	(ProblemCode)(0),                    // 8: ProblemCode
+	(*SignUpRequest)(nil),               // 0: SignUpRequest
+	(*SignUpResponse)(nil),              // 1: SignUpResponse
+	(*ContactConformationRequest)(nil),  // 2: ContactConformationRequest
+	(*ContactConformationResponse)(nil), // 3: ContactConformationResponse
+	(*ResendOTPRequest)(nil),            // 4: ResendOTPRequest
+	(*ResendOTPResponse)(nil),           // 5: ResendOTPResponse
+	(*ResponseData)(nil),                // 6: ResponseData
+	(ProblemCode)(0),                    // 7: ProblemCode
+	(OTPResponse)(0),                    // 8: OTPResponse
 	(*duration.Duration)(nil),           // 9: google.protobuf.Duration
 }
 var file_signup_message_proto_depIdxs = []int32{
-	7, // 0: SignUpResponse.responseData:type_name -> ResponseData
-	8, // 1: SignUpResponse.code:type_name -> ProblemCode
-	0, // 2: ResendOTPResponse.response:type_name -> OTPResponse
+	6, // 0: SignUpResponse.responseData:type_name -> ResponseData
+	7, // 1: SignUpResponse.code:type_name -> ProblemCode
+	8, // 2: ResendOTPResponse.response:type_name -> OTPResponse
 	9, // 3: ResendOTPResponse.timeToWaitForNextRequest:type_name -> google.protobuf.Duration
 	4, // [4:4] is the sub-list for method output_type
 	4, // [4:4] is the sub-list for method input_type
@@ -627,14 +578,13 @@ func file_signup_message_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_signup_message_proto_rawDesc,
-			NumEnums:      1,
+			NumEnums:      0,
 			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_signup_message_proto_goTypes,
 		DependencyIndexes: file_signup_message_proto_depIdxs,
-		EnumInfos:         file_signup_message_proto_enumTypes,
 		MessageInfos:      file_signup_message_proto_msgTypes,
 	}.Build()
 	File_signup_message_proto = out.File

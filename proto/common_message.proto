@@ -23,4 +23,10 @@ enum ProblemCode {
   UnableToSendOTP = 12;
   InvalidPassword = 13;
   InvalidUserCredentials = 14;
-};
+  UserNotExist = 88;
+}
+
+enum OTPResponse{
+  NotOk = 0;
+  OK = 1;
+}

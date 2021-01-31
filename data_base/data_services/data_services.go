@@ -144,7 +144,7 @@ func (dataService *DataServices) GetPhoneDetails() (*sqlx.Rows, error) {
 	dataService.mutex.RLock()
 	defer dataService.mutex.RUnlock()
 
-	rows, err := dataService.Db.Queryx("select phone_no, email from user_data")
+	rows, err := dataService.Db.Queryx("select phone_no, user_id from user_data")
 	if err != nil {
 		fmt.Println(err)
 		return nil, status.Errorf(codes.Internal, "Unable To Get Data", err)
@@ -158,7 +158,6 @@ func NewDbConnection() *DataServices {
 	if err != nil {
 		panic(err)
 	}
-
 	dbName, _ := strconv.Atoi(os.Getenv("RedisDB"))
 
 	rdb := redis.NewClient(&redis.Options{
@@ -173,30 +172,36 @@ func NewDbConnection() *DataServices {
 	}
 }
 
-//func (dataService *DataServices) SetUserAuthorized(uuid string, authorized bool) error {
-//	dataService.mutex.Lock()
-//	defer dataService.mutex.Unlock()
-//
-//	tx := dataService.Db.MustBegin()
-//
-//	rows := tx.MustExec("update user_data set is_mail_verified=$1 where user_id=$2", authorized, uuid)
-//
-//	err := tx.Commit()
-//
-//	if err != nil {
-//		return status.Errorf(codes.Internal, "Unable Complete Update ", err)
-//	}
-//
-//	fmt.Println("Performing Checks")
-//	affected, err := rows.RowsAffected()
-//
-//	if err != nil {
-//		return status.Errorf(codes.Internal, "Unable To Get Data ", err)
-//	}
-//
-//	if affected <= 0{
-//		fmt.Println("User Not Exist")
-//		return status.Errorf(codes.NotFound, "User Does Not Exists")
-//	}
-//	return nil
-//}
+func (dataService *DataServices) UpdatePassword(userId string, newPassword string) error {
+	dataService.mutex.Lock()
+	defer dataService.mutex.Unlock()
+
+	tx := dataService.Db.MustBegin()
+
+	cost, _ := strconv.Atoi(os.Getenv("cost"))
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), cost)
+	if err != nil {
+		return status.Errorf(codes.Internal, "Unable To Hash ", err)
+	}
+
+	rows := tx.MustExec("update user_data set password=$1 where user_id=$2", hashedPassword, userId)
+
+	err = tx.Commit()
+
+	if err != nil {
+		return status.Errorf(codes.Internal, "Unable Complete Update ", err)
+	}
+
+	fmt.Println("Performing Checks")
+	affected, err := rows.RowsAffected()
+
+	if err != nil {
+		return status.Errorf(codes.Internal, "Unable To Get Data ", err)
+	}
+
+	if affected <= 0 {
+		fmt.Println("User Not Exist")
+		return status.Errorf(codes.NotFound, "User Does Not Exists")
+	}
+	return nil
+}
