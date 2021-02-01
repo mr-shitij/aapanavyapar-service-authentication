@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+option go_package = ".;pb";
+
+message newTokenRequest {
+  string refreshToken = 21;
+}
+
+message newTokenResponse {
+  string token = 22;
+}

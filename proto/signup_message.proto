@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+option go_package = ".;pb";
+
+import "common_message.proto";
+import "google/protobuf/duration.proto";
+
+message SignUpRequest {
+  string username = 25;
+  string password = 26;
+  string phoneNo = 27;
+  string email = 28;
+  string pinCode = 29;
+}
+
+message SignUpResponse {
+
+  oneof data {
+    ResponseData responseData = 40;
+    ProblemCode code = 32;
+  }
+  bool authorized = 50;
+}
+
+message ContactConformationRequest {
+  string token = 33;
+  string otp = 34;
+}
+
+message ContactConformationResponse {
+  string token = 35;
+  string refreshToken = 36;
+}
+
+message ResendOTPRequest {
+  string token = 54;
+}
+
+message ResendOTPResponse {
+  OTPResponse response = 55;
+  google.protobuf.Duration timeToWaitForNextRequest = 56;
+}

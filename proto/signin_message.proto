@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option go_package = ".;pb";
+
+import "common_message.proto";
+
+message SignInForMailBaseRequest {
+  string mail = 8;
+  string password = 9;
+}
+
+message SignInForMailBaseResponse {
+    oneof data{
+      ResponseData responseData = 10;
+      ProblemCode code = 11;
+    }
+}

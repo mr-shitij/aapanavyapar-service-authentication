@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+option go_package = ".;pb";
+
+message ResponseData{
+  string token = 30;
+  string refreshToken = 31;
+
+}
+
+enum ProblemCode {
+  NoUserNameIsProvided = 0;
+  NoPhoneNumberIsProvided = 1;
+  NoPasswordIsProvided = 2;
+  NoPinCodeIsProvided = 4;
+  NoEmailIsProvided = 5;
+  UserAlreadyExist = 6;
+  UserAlreadyExistWithSameContactNumber = 7;
+  InvalidEmailAddress = 8;
+  InvalidPasswordLength = 9;
+  InvalidPhoneNumber = 10;
+  InvalidPinCode = 11;
+  UnableToSendOTP = 12;
+  InvalidPassword = 13;
+  InvalidUserCredentials = 14;
+  UserNotExist = 88;
+}
+
+enum OTPResponse{
+  NotOk = 0;
+  OK = 1;
+}
