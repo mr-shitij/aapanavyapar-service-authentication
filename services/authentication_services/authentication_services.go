@@ -247,6 +247,11 @@ func (authenticationServer *AuthenticationServer) SignInWithMail(ctx context.Con
 	}
 	fmt.Println("Sanitization and validation completed")
 
+	err = helpers.ContextError(ctx)
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	userId, err := authenticationServer.data.SignInWithMailAndPassword(email, password)
 	if err != nil {
 		if e, ok := status.FromError(err); ok {
@@ -270,10 +275,14 @@ func (authenticationServer *AuthenticationServer) SignInWithMail(ctx context.Con
 		return nil, status.Errorf(codes.Unknown, "Unable To Authenticate", err)
 	}
 
+	fmt.Println("Generating token")
+
 	refreshToken, authToken, err := authenticationServer.data.GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx, userId, true, []int{data_services.LogOut, data_services.GetNewToken, data_services.External})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Unable To Generate Refresh Token", err)
 	}
+
+	fmt.Println("Generated token")
 
 	return &pb.SignInForMailBaseResponse{
 		Data: &pb.SignInForMailBaseResponse_ResponseData{
