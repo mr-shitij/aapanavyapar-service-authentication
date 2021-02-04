@@ -46,6 +46,7 @@ func SanitizeAndValidateEmailAddress(email string) (string, error) {
 	}
 	return "", status.Error(codes.Code(pb.ProblemCode_NoEmailIsProvided), "Email Address Is Empty")
 }
+
 func SanitizeAndValidatePhoneNumber(phoneNumber string) (string, error) {
 	p := bluemonday.UGCPolicy()
 	phoneNumber = p.Sanitize(strings.TrimSpace(phoneNumber))
@@ -57,6 +58,7 @@ func SanitizeAndValidatePhoneNumber(phoneNumber string) (string, error) {
 	}
 	return "", status.Error(codes.Code(pb.ProblemCode_NoPhoneNumberIsProvided), "Phone Number  Is Empty")
 }
+
 func SanitizeAndValidatePinCode(pinCode string) (string, error) {
 	p := bluemonday.UGCPolicy()
 	pinCode = p.Sanitize(strings.TrimSpace(pinCode))
@@ -68,6 +70,7 @@ func SanitizeAndValidatePinCode(pinCode string) (string, error) {
 	}
 	return "", status.Error(codes.Code(pb.ProblemCode_NoPinCodeIsProvided), "pin Code Is Empty")
 }
+
 func SanitizeAndValidatePassword(password string) (string, error) {
 	if password != "" {
 		if len(password) < 8 {
