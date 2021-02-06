@@ -47,13 +47,13 @@ services:
   app:
     build: .
     ports:
-      - "8080:8080"
+      - "4356:8080"
     restart: on-failure
     depends_on:
       - postgres
       - redis
     container_name: app
-    command: ["./main"]
+    command: ["./start.sh"]
     networks:
       aappanavypar-frountend:
       aappanavypar-backend:
