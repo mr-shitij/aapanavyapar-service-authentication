@@ -50,9 +50,13 @@ func main() {
 		fmt.Println("Refresh Token Of Signup : ")
 		authentication_services.PrintClaimsOfRefreshToken(responseData.ResponseData.GetRefreshToken())
 
+		var otp string
+		fmt.Println("Enter OTP : ")
+		fmt.Scanln(&otp)
+
 		respContactConform, err := server.ContactConformation(context.Background(), &pb.ContactConformationRequest{
 			Token: responseData.ResponseData.GetToken(),
-			Otp:   "12345",
+			Otp:   otp,
 		})
 
 		if err != nil {
@@ -171,7 +175,7 @@ func main() {
 //}
 //
 //
-//data, err := db.GetContactListDataFormCash(context.Background(), "1234567948")
+//data, err := db.GetContactListDataFromCash(context.Background(), "1234567948")
 //if err != nil {
 //	fmt.Println("Get User : ", err)
 //}
@@ -184,7 +188,7 @@ func main() {
 //}
 //
 //
-//data, err = db.GetContactListDataFormCash(context.Background(), "1234567998")
+//data, err = db.GetContactListDataFromCash(context.Background(), "1234567998")
 //if err != nil {
 //	fmt.Println("Get User : ", err)
 //}

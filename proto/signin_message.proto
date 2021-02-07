@@ -8,6 +8,7 @@ option java_package = "com.aapanavyapar.aapanavyapar.services";
 import "common_message.proto";
 
 message SignInForMailBaseRequest {
+  string apiKey = 105;
   string mail = 8;
   string password = 9;
 }

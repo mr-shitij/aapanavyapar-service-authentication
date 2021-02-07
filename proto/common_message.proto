@@ -27,6 +27,8 @@ enum ProblemCode {
   InvalidPassword = 13;
   InvalidUserCredentials = 14;
   UserNotExist = 88;
+  OTPIsAlreadySent = 100;
+  APIKeyNotPresent = 200;
 }
 
 enum OTPResponse{

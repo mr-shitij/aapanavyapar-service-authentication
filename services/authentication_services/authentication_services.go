@@ -76,6 +76,10 @@ func PrintClaimsOfRefreshToken(token string) {
 
 func (authenticationServer *AuthenticationServer) GetNewToken(ctx context.Context, request *pb.NewTokenRequest) (*pb.NewTokenResponse, error) {
 
+	if !helpers.CheckForAPIKey(request.GetApiKey()) {
+		return nil, status.Errorf(codes.Unauthenticated, "No API Key Is Specified")
+	}
+
 	receivedRefreshToken, err := authenticationServer.data.ValidateToken(ctx, request.GetRefreshToken(), os.Getenv("REFRESH_TOKEN_SECRETE"), data_services.GetNewToken)
 	if err != nil {
 		return nil, err
@@ -96,6 +100,10 @@ func (authenticationServer *AuthenticationServer) GetNewToken(ctx context.Contex
 }
 
 func (authenticationServer *AuthenticationServer) Signup(ctx context.Context, request *pb.SignUpRequest) (*pb.SignUpResponse, error) {
+
+	if !helpers.CheckForAPIKey(request.GetApiKey()) {
+		return nil, status.Errorf(codes.Unauthenticated, "No API Key Is Specified")
+	}
 
 	user, err := helpers.SanitizeAndValidate(request)
 	fmt.Println("Sanitization and validation completed")
@@ -157,7 +165,17 @@ func (authenticationServer *AuthenticationServer) Signup(ctx context.Context, re
 		return nil, err
 	}
 
-	if _, err := authenticationServer.data.GetContactListDataFormCash(ctx, user.PhoneNo); err == nil {
+	if _, err := authenticationServer.data.GetContactListDataFromCash(ctx, user.PhoneNo); err == nil {
+		return &pb.SignUpResponse{
+			Data: &pb.SignUpResponse_Code{
+				Code: pb.ProblemCode_UserAlreadyExistWithSameContactNumber,
+			},
+			Authorized: false,
+		}, nil
+
+	}
+
+	if _, err := authenticationServer.data.GetTempContactFromCash(ctx, user.PhoneNo); err == nil {
 		return &pb.SignUpResponse{
 			Data: &pb.SignUpResponse_Code{
 				Code: pb.ProblemCode_UserAlreadyExistWithSameContactNumber,
@@ -185,6 +203,11 @@ func (authenticationServer *AuthenticationServer) Signup(ctx context.Context, re
 		return nil, err
 	}
 
+	err = authenticationServer.data.SetTempContactToCash(ctx, user.PhoneNo, userId.String())
+	if err != nil {
+		return nil, err
+	}
+
 	refreshToken, authToken, err := authenticationServer.data.GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx, userId.String(), false, []int{data_services.GetNewToken, data_services.ResendOTP, data_services.ConformContact, data_services.LogOut})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Unable To Generate Refresh Token", err)
@@ -207,6 +230,11 @@ func (authenticationServer *AuthenticationServer) Signup(ctx context.Context, re
 }
 
 func (authenticationServer *AuthenticationServer) SignInWithMail(ctx context.Context, request *pb.SignInForMailBaseRequest) (*pb.SignInForMailBaseResponse, error) {
+
+	if !helpers.CheckForAPIKey(request.GetApiKey()) {
+		return nil, status.Errorf(codes.Unauthenticated, "No API Key Is Specified")
+	}
+
 	email, err := helpers.SanitizeAndValidateEmailAddress(request.Mail)
 	if err != nil {
 		if e, ok := status.FromError(err); ok {
@@ -296,12 +324,17 @@ func (authenticationServer *AuthenticationServer) SignInWithMail(ctx context.Con
 }
 
 func (authenticationServer *AuthenticationServer) Logout(ctx context.Context, request *pb.LogoutRequest) (*pb.LogoutResponse, error) {
+
+	if !helpers.CheckForAPIKey(request.GetApiKey()) {
+		return nil, status.Errorf(codes.Unauthenticated, "No API Key Is Specified")
+	}
+
 	token, err := authenticationServer.data.ValidateToken(ctx, request.GetToken(), os.Getenv("AUTH_TOKEN_SECRETE"), data_services.LogOut)
 	if err != nil {
 		return &pb.LogoutResponse{Status: false}, err
 	}
 
-	err = authenticationServer.data.DelDataFormCash(ctx, token.Subject)
+	err = authenticationServer.data.DelDataFromCash(ctx, token.Subject)
 	if err != nil {
 		return &pb.LogoutResponse{Status: false}, err
 	}
@@ -309,6 +342,11 @@ func (authenticationServer *AuthenticationServer) Logout(ctx context.Context, re
 }
 
 func (authenticationServer *AuthenticationServer) ContactConformation(ctx context.Context, request *pb.ContactConformationRequest) (*pb.ContactConformationResponse, error) {
+
+	if !helpers.CheckForAPIKey(request.GetApiKey()) {
+		return nil, status.Errorf(codes.Unauthenticated, "No API Key Is Specified")
+	}
+
 	token, err := authenticationServer.data.ValidateToken(ctx, request.GetToken(), os.Getenv("AUTH_TOKEN_SECRETE"), data_services.ConformContact)
 	if err != nil {
 		return nil, err
@@ -322,7 +360,7 @@ func (authenticationServer *AuthenticationServer) ContactConformation(ctx contex
 		return nil, status.Errorf(codes.AlreadyExists, "Already Authorized")
 	}
 
-	cashVal, err := authenticationServer.data.GetDataFormCash(ctx, token.Audience)
+	cashVal, err := authenticationServer.data.GetDataFromCash(ctx, token.Audience)
 	if err != nil {
 		return nil, err
 	}
@@ -345,17 +383,23 @@ func (authenticationServer *AuthenticationServer) ContactConformation(ctx contex
 			return nil, err // If User Already Exist Then Report Inconsistency with cash and database
 		}
 
-		err = authenticationServer.data.DelDataFormCash(ctx, token.Subject)
+		err = authenticationServer.data.DelDataFromCash(ctx, token.Subject)
 		if err != nil {
 			return nil, err
 		}
 		fmt.Println("Refresh From Cash Delete ", err)
 
-		err = authenticationServer.data.DelDataFormCash(ctx, token.Audience)
+		err = authenticationServer.data.DelDataFromCash(ctx, token.Audience)
 		if err != nil {
 			return nil, err
 		}
 		fmt.Println("Token From Cash Delete ", err)
+
+		err = authenticationServer.data.DelDataFromCash(ctx, data.PhoneNo+"_TEMP_CONTACT")
+		if err != nil {
+			return nil, err
+		}
+		fmt.Println("Contact From Cash Delete ", err)
 
 		refreshTok, authTok, err := authenticationServer.data.GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx, token.Audience, true, []int{data_services.LogOut, data_services.GetNewToken, data_services.External})
 		if err != nil {
@@ -372,6 +416,11 @@ func (authenticationServer *AuthenticationServer) ContactConformation(ctx contex
 }
 
 func (authenticationServer *AuthenticationServer) ResendOTP(ctx context.Context, request *pb.ResendOTPRequest) (*pb.ResendOTPResponse, error) {
+
+	if !helpers.CheckForAPIKey(request.GetApiKey()) {
+		return nil, status.Errorf(codes.Unauthenticated, "No API Key Is Specified")
+	}
+
 	token, err := authenticationServer.data.ValidateToken(ctx, request.GetToken(), os.Getenv("AUTH_TOKEN_SECRETE"), data_services.ResendOTP)
 	if err != nil {
 		return nil, err
@@ -385,7 +434,7 @@ func (authenticationServer *AuthenticationServer) ResendOTP(ctx context.Context,
 		return nil, status.Errorf(codes.PermissionDenied, "You are not authorized for this service")
 	}
 
-	val, err := authenticationServer.data.GetDataFormCash(ctx, token.Audience)
+	val, err := authenticationServer.data.GetDataFromCash(ctx, token.Audience)
 
 	var data structs.OTPCashData
 	structs.UnmarshalOTPCash([]byte(val), &data)
@@ -486,12 +535,17 @@ func (authenticationServer *AuthenticationServer) ResendOTP(ctx context.Context,
 }
 
 func (authenticationServer *AuthenticationServer) ForgetPassword(ctx context.Context, request *pb.ForgetPasswordRequest) (*pb.ForgetPasswordResponse, error) {
+
+	if !helpers.CheckForAPIKey(request.GetApiKey()) {
+		return nil, status.Errorf(codes.Unauthenticated, "No API Key Is Specified")
+	}
+
 	phoNo, err := helpers.SanitizeAndValidatePhoneNumber(request.GetPhoNo())
 	if err != nil {
 		return nil, err
 	}
 
-	id, err := authenticationServer.data.GetContactListDataFormCash(ctx, phoNo)
+	id, err := authenticationServer.data.GetContactListDataFromCash(ctx, phoNo)
 	if err != nil {
 		return &pb.ForgetPasswordResponse{
 			Data: &pb.ForgetPasswordResponse_Code{
@@ -520,6 +574,11 @@ func (authenticationServer *AuthenticationServer) ForgetPassword(ctx context.Con
 }
 
 func (authenticationServer *AuthenticationServer) ConformForgetPasswordOTP(ctx context.Context, request *pb.ConformForgetPasswordOTPRequest) (*pb.ConformForgetPasswordOTPResponse, error) {
+
+	if !helpers.CheckForAPIKey(request.GetApiKey()) {
+		return nil, status.Errorf(codes.Unauthenticated, "No API Key Is Specified")
+	}
+
 	token, err := authenticationServer.data.ValidateToken(ctx, request.GetToken(), os.Getenv("AUTH_TOKEN_SECRETE"), data_services.ForgetPassword)
 	if err != nil {
 		return nil, err
@@ -533,7 +592,7 @@ func (authenticationServer *AuthenticationServer) ConformForgetPasswordOTP(ctx c
 		return nil, status.Errorf(codes.AlreadyExists, "Invalid Token")
 	}
 
-	cashVal, err := authenticationServer.data.GetDataFormCash(ctx, token.Audience)
+	cashVal, err := authenticationServer.data.GetDataFromCash(ctx, token.Audience)
 	if err != nil {
 		return nil, err
 	}
@@ -546,13 +605,13 @@ func (authenticationServer *AuthenticationServer) ConformForgetPasswordOTP(ctx c
 
 	if val.OTP == request.GetOtp() {
 
-		err = authenticationServer.data.DelDataFormCash(ctx, token.Subject)
+		err = authenticationServer.data.DelDataFromCash(ctx, token.Subject)
 		if err != nil {
 			return nil, err
 		}
 		fmt.Println("Refresh From Cash Delete ", err)
 
-		err = authenticationServer.data.DelDataFormCash(ctx, token.Audience)
+		err = authenticationServer.data.DelDataFromCash(ctx, token.Audience)
 		if err != nil {
 			return nil, err
 		}
@@ -569,13 +628,13 @@ func (authenticationServer *AuthenticationServer) ConformForgetPasswordOTP(ctx c
 
 	}
 
-	err = authenticationServer.data.DelDataFormCash(ctx, token.Subject)
+	err = authenticationServer.data.DelDataFromCash(ctx, token.Subject)
 	if err != nil {
 		return nil, err
 	}
 	fmt.Println("Refresh From Cash Delete ", err)
 
-	err = authenticationServer.data.DelDataFormCash(ctx, token.Audience)
+	err = authenticationServer.data.DelDataFromCash(ctx, token.Audience)
 	if err != nil {
 		return nil, err
 	}
@@ -586,6 +645,11 @@ func (authenticationServer *AuthenticationServer) ConformForgetPasswordOTP(ctx c
 }
 
 func (authenticationServer *AuthenticationServer) SetNewPassword(ctx context.Context, request *pb.SetNewPasswordRequest) (*pb.SetNewPasswordResponse, error) {
+
+	if !helpers.CheckForAPIKey(request.GetApiKey()) {
+		return nil, status.Errorf(codes.Unauthenticated, "No API Key Is Specified")
+	}
+
 	token, err := authenticationServer.data.ValidateToken(ctx, request.GetNewPassToken(), os.Getenv("PASS_TOKEN_SECRETE"), data_services.NewPassToken)
 	if err != nil {
 		return &pb.SetNewPasswordResponse{Status: false}, err
@@ -596,7 +660,7 @@ func (authenticationServer *AuthenticationServer) SetNewPassword(ctx context.Con
 		return &pb.SetNewPasswordResponse{Status: false}, status.Errorf(codes.InvalidArgument, "Invalid Token", err)
 	}
 	if !authorized {
-		err = authenticationServer.data.DelDataFormCash(ctx, token.Subject)
+		err = authenticationServer.data.DelDataFromCash(ctx, token.Subject)
 		if err != nil {
 			return &pb.SetNewPasswordResponse{Status: false}, err
 		}

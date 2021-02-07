@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 export $(grep -v '^#' .env | xargs)
 
