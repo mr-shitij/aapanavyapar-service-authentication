@@ -32,6 +32,7 @@ Request
         string phoneNo = 27;
         string email = 28;
         string pinCode = 29;
+        string apiKey = 106;
 
     }  
     
@@ -53,6 +54,7 @@ Request
     message ContactConformationRequest {
         string token = 33;
         string otp = 34;
+        string apiKey = 107;
     }
 
 
@@ -70,6 +72,7 @@ Request
 
     message ResendOTPRequest {
         string token = 54;
+        string apiKey = 108;
     }
 
 Response
@@ -85,6 +88,7 @@ Request
 
     message newTokenRequest {
         string refreshToken = 21;
+        string apiKey = 109;
     }
 
 Response
@@ -100,6 +104,7 @@ Request
     message SignInForMailBaseRequest {
         string mail = 8;
         string password = 9;
+        string apiKey = 105;
     }
 
 Response
@@ -117,6 +122,7 @@ Request
 
     message LogoutRequest {
         string token = 36;
+        string apiKey = 104;
     }
 
 Response
@@ -131,6 +137,7 @@ Request
 
     message ForgetPasswordRequest {
         string phoNo = 55;
+        string apiKey = 101;
     }
 
 Response
@@ -149,6 +156,7 @@ Request
     message ConformForgetPasswordOTPRequest {
         string otp = 59;
         string token = 60;
+        string apiKey = 102;
     }
 
 Response
@@ -164,6 +172,7 @@ Request
     message SetNewPasswordRequest {
         string newPassToken = 72;
         string newPassword = 73;
+        string apiKey = 103;
     }
 
 Response
