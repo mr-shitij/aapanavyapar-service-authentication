@@ -36,18 +36,12 @@ func (dataService *DataServices) CreateUser(ctx context.Context, user *structs.U
 
 	tx := dataService.Db.MustBegin()
 
-	cost, _ := strconv.Atoi(os.Getenv("cost"))
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), cost)
-	if err != nil {
-		return status.Errorf(codes.Internal, "Unable To Hash ", err)
-	}
-
 	if err := helpers.ContextError(ctx); err != nil {
 		return err
 	}
 
 	fmt.Println("Executing Query Now")
-	rows := tx.MustExec("insert into user_data (user_id, username, password, phone_no, email, pin_code) values ($1, $2, $3, $4, $5, $6)", user.UserId, user.Username, hashedPassword, user.PhoneNo, user.Email, user.PinCode)
+	rows := tx.MustExec("insert into user_data (user_id, username, password, phone_no, email, pin_code) values ($1, $2, $3, $4, $5, $6)", user.UserId, user.Username, user.Password, user.PhoneNo, user.Email, user.PinCode)
 
 	affected, err := rows.RowsAffected()
 	if err != nil {
@@ -113,7 +107,7 @@ func (dataService *DataServices) isUserAlreadyExist(email string, phNo string) (
 	return true, status.Errorf(codes.Code(pb.ProblemCode_UserAlreadyExist), "User With Provided Email or Phone Number Already Exist") // User Already Exist
 }
 
-func (dataService *DataServices) SignInWithMailAndPassword(email string, password string) (string, error) {
+func (dataService *DataServices) SignIn(phoneNo string, password string) (string, error) {
 
 	dataService.mutex.Lock()
 	defer dataService.mutex.Unlock()
@@ -124,7 +118,7 @@ func (dataService *DataServices) SignInWithMailAndPassword(email string, passwor
 	}
 
 	var data = auth{}
-	err := dataService.Db.Get(&data, "select user_id, password from user_data where email=$1", email)
+	err := dataService.Db.Get(&data, "select user_id, password from user_data where phone_no=$1", phoneNo)
 	if err != nil {
 		fmt.Println(err)
 		return "", status.Errorf(codes.Code(pb.ProblemCode_InvalidUserCredentials), "Invalid Credentials")

@@ -62,6 +62,16 @@ func (dataService *DataServices) GetTemporaryUserFromCash(ctx context.Context, i
 	return &data, nil
 }
 
+func (dataService *DataServices) DelTemporaryUserFromCash(ctx context.Context, id string) error {
+
+	err := dataService.DelDataFromCash(ctx, id+"_Temp")
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+
 func (dataService *DataServices) GetContactListDataFromCash(ctx context.Context, phoNo string) (string, error) {
 
 	phoNo = helpers.EncodePhoneNo(phoNo)
@@ -117,6 +127,16 @@ func (dataService *DataServices) SetTempContactToCash(ctx context.Context, key s
 
 	if err != nil {
 		return status.Errorf(codes.Internal, "unable to add temp contact in cash  : %w", err)
+	}
+
+	return nil
+}
+
+func (dataService *DataServices) DelTempContactFromCash(ctx context.Context, key string) error {
+
+	err := dataService.DelDataFromCash(ctx, key+"_TEMP_CONTACT")
+	if err != nil {
+		return err
 	}
 
 	return nil

@@ -3,6 +3,6 @@ create table user_data(
   username varchar(254) not null,
   password varchar(254) not null,
   phone_no varchar(10) not null unique,
-  email varchar(254),
+  phoneNo varchar(254),
   pin_code varchar(6) not null
 );

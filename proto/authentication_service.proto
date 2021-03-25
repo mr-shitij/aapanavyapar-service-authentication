@@ -18,7 +18,7 @@ service Authentication {
   rpc ResendOTP (ResendOTPRequest) returns (ResendOTPResponse) {};
 
   rpc GetNewToken (newTokenRequest) returns (newTokenResponse) {};
-  rpc SignInWithMail (SignInForMailBaseRequest) returns (SignInForMailBaseResponse) {};
+  rpc SignIn (SignInRequest) returns (SignInResponse) {};
   rpc Logout (LogoutRequest) returns (LogoutResponse) {};
 
   rpc ForgetPassword (ForgetPasswordRequest) returns (ForgetPasswordResponse) {};

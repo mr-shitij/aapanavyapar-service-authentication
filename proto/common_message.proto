@@ -29,6 +29,8 @@ enum ProblemCode {
   UserNotExist = 88;
   OTPIsAlreadySent = 100;
   APIKeyNotPresent = 200;
+  UserWithSameContactNumberAlreadyInRegistrationProcess = 210;
+  InternalProblem = 220;
 }
 
 enum OTPResponse{

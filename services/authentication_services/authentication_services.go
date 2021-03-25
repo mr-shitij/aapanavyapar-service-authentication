@@ -10,9 +10,11 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	"github.com/google/uuid"
 	"github.com/o1egl/paseto/v2"
+	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -178,7 +180,7 @@ func (authenticationServer *AuthenticationServer) Signup(ctx context.Context, re
 	if _, err := authenticationServer.data.GetTempContactFromCash(ctx, user.PhoneNo); err == nil {
 		return &pb.SignUpResponse{
 			Data: &pb.SignUpResponse_Code{
-				Code: pb.ProblemCode_UserAlreadyExistWithSameContactNumber,
+				Code: pb.ProblemCode_UserWithSameContactNumberAlreadyInRegistrationProcess,
 			},
 			Authorized: false,
 		}, nil
@@ -191,10 +193,21 @@ func (authenticationServer *AuthenticationServer) Signup(ctx context.Context, re
 	}
 	fmt.Println("UUID Generated")
 
+	cost, _ := strconv.Atoi(os.Getenv("cost"))
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.GetPassword()), cost)
+	if err != nil {
+		return &pb.SignUpResponse{
+			Data: &pb.SignUpResponse_Code{
+				Code: pb.ProblemCode_InternalProblem,
+			},
+			Authorized: false,
+		}, nil
+	}
+
 	err = authenticationServer.data.CreateTemporaryUserInCash(ctx, &structs.UserData{
 		UserId:   userId.String(),
 		Username: user.GetUsername(),
-		Password: user.GetPassword(),
+		Password: string(hashedPassword),
 		PhoneNo:  user.GetPhoneNo(),
 		Email:    user.GetEmail(),
 		PinCode:  user.GetPinCode(),
@@ -229,44 +242,54 @@ func (authenticationServer *AuthenticationServer) Signup(ctx context.Context, re
 	}, nil
 }
 
-func (authenticationServer *AuthenticationServer) SignInWithMail(ctx context.Context, request *pb.SignInForMailBaseRequest) (*pb.SignInForMailBaseResponse, error) {
+func (authenticationServer *AuthenticationServer) SignIn(ctx context.Context, request *pb.SignInRequest) (*pb.SignInResponse, error) {
 
 	if !helpers.CheckForAPIKey(request.GetApiKey()) {
 		return nil, status.Errorf(codes.Unauthenticated, "No API Key Is Specified")
 	}
 
-	email, err := helpers.SanitizeAndValidateEmailAddress(request.Mail)
+	phoneNo, err := helpers.SanitizeAndValidatePhoneNumber(request.PhoneNo)
 	if err != nil {
 		if e, ok := status.FromError(err); ok {
 			switch e.Code() {
-			case codes.Code(pb.ProblemCode_NoEmailIsProvided):
-				return &pb.SignInForMailBaseResponse{
-					Data: &pb.SignInForMailBaseResponse_Code{
-						Code: pb.ProblemCode_NoEmailIsProvided,
+			case codes.Code(pb.ProblemCode_NoPhoneNumberIsProvided):
+				return &pb.SignInResponse{
+					Data: &pb.SignInResponse_Code{
+						Code: pb.ProblemCode_NoPhoneNumberIsProvided,
 					},
 				}, nil
-			case codes.Code(pb.ProblemCode_InvalidEmailAddress):
-				return &pb.SignInForMailBaseResponse{
-					Data: &pb.SignInForMailBaseResponse_Code{
-						Code: pb.ProblemCode_InvalidEmailAddress,
+			case codes.Code(pb.ProblemCode_InvalidPhoneNumber):
+				return &pb.SignInResponse{
+					Data: &pb.SignInResponse_Code{
+						Code: pb.ProblemCode_InvalidPhoneNumber,
 					},
 				}, nil
 			}
 		}
 	}
+
+	if _, err := authenticationServer.data.GetContactListDataFromCash(ctx, request.PhoneNo); err == nil {
+		return &pb.SignInResponse{
+			Data: &pb.SignInResponse_Code{
+				Code: pb.ProblemCode_UserAlreadyExistWithSameContactNumber,
+			},
+		}, nil
+
+	}
+
 	password, err := helpers.SanitizeAndValidatePassword(request.Password)
 	if err != nil {
 		if e, ok := status.FromError(err); ok {
 			switch e.Code() {
 			case codes.Code(pb.ProblemCode_NoPasswordIsProvided):
-				return &pb.SignInForMailBaseResponse{
-					Data: &pb.SignInForMailBaseResponse_Code{
+				return &pb.SignInResponse{
+					Data: &pb.SignInResponse_Code{
 						Code: pb.ProblemCode_NoPasswordIsProvided,
 					},
 				}, nil
 			case codes.Code(pb.ProblemCode_InvalidPasswordLength):
-				return &pb.SignInForMailBaseResponse{
-					Data: &pb.SignInForMailBaseResponse_Code{
+				return &pb.SignInResponse{
+					Data: &pb.SignInResponse_Code{
 						Code: pb.ProblemCode_InvalidPasswordLength,
 					},
 				}, nil
@@ -280,20 +303,20 @@ func (authenticationServer *AuthenticationServer) SignInWithMail(ctx context.Con
 		fmt.Println(err)
 	}
 
-	userId, err := authenticationServer.data.SignInWithMailAndPassword(email, password)
+	userId, err := authenticationServer.data.SignIn(phoneNo, password)
 	if err != nil {
 		if e, ok := status.FromError(err); ok {
 			switch e.Code() {
 			case codes.Code(pb.ProblemCode_InvalidUserCredentials):
-				return &pb.SignInForMailBaseResponse{
-					Data: &pb.SignInForMailBaseResponse_Code{
+				return &pb.SignInResponse{
+					Data: &pb.SignInResponse_Code{
 						Code: pb.ProblemCode_InvalidUserCredentials,
 					},
 				}, nil
 
 			case codes.Code(pb.ProblemCode_InvalidPassword):
-				return &pb.SignInForMailBaseResponse{
-					Data: &pb.SignInForMailBaseResponse_Code{
+				return &pb.SignInResponse{
+					Data: &pb.SignInResponse_Code{
 						Code: pb.ProblemCode_InvalidPassword,
 					},
 				}, nil
@@ -312,8 +335,8 @@ func (authenticationServer *AuthenticationServer) SignInWithMail(ctx context.Con
 
 	fmt.Println("Generated token")
 
-	return &pb.SignInForMailBaseResponse{
-		Data: &pb.SignInForMailBaseResponse_ResponseData{
+	return &pb.SignInResponse{
+		Data: &pb.SignInResponse_ResponseData{
 			ResponseData: &pb.ResponseData{
 				Token:        authToken,
 				RefreshToken: refreshToken,
@@ -334,10 +357,12 @@ func (authenticationServer *AuthenticationServer) Logout(ctx context.Context, re
 		return &pb.LogoutResponse{Status: false}, err
 	}
 
-	err = authenticationServer.data.DelDataFromCash(ctx, token.Subject)
+	err = authenticationServer.data.DelDataFromCash(ctx, token.Subject) // Do care for refresh token
 	if err != nil {
 		return &pb.LogoutResponse{Status: false}, err
 	}
+	_ = authenticationServer.data.DelDataFromCash(ctx, token.Audience) // No care for auth token
+
 	return &pb.LogoutResponse{Status: true}, nil
 }
 
@@ -352,13 +377,15 @@ func (authenticationServer *AuthenticationServer) ContactConformation(ctx contex
 		return nil, err
 	}
 
+	// Here to
 	var authorized bool
 	if err = token.Get("authorized", &authorized); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid Token", err)
 	}
 	if authorized {
-		return nil, status.Errorf(codes.AlreadyExists, "Already Authorized")
+		return nil, status.Errorf(codes.AlreadyExists, "Already Authorized") //If Occur Then Serious Data Breach From Internal Organization; Change Token Generation Credentials.
 	}
+	// Here Extra Check.
 
 	cashVal, err := authenticationServer.data.GetDataFromCash(ctx, token.Audience)
 	if err != nil {
@@ -378,10 +405,11 @@ func (authenticationServer *AuthenticationServer) ContactConformation(ctx contex
 			return nil, err
 		}
 
-		err = authenticationServer.data.CreateUser(ctx, data)
-		if err != nil {
-			return nil, err // If User Already Exist Then Report Inconsistency with cash and database
+		// From Here
+		if val.PhoneNo != data.PhoneNo {
+			return nil, status.Errorf(codes.Aborted, "Unauthenticated User") //If Occur Then Serious Data Breach From Internal Organization; Change Token Generation Credentials.
 		}
+		// To Here Extra Check
 
 		err = authenticationServer.data.DelDataFromCash(ctx, token.Subject)
 		if err != nil {
@@ -393,13 +421,23 @@ func (authenticationServer *AuthenticationServer) ContactConformation(ctx contex
 		if err != nil {
 			return nil, err
 		}
-		fmt.Println("Token From Cash Delete ", err)
+		fmt.Println("OTP Data From Cash Delete ", err)
 
-		err = authenticationServer.data.DelDataFromCash(ctx, data.PhoneNo+"_TEMP_CONTACT")
+		err = authenticationServer.data.DelTempContactFromCash(ctx, data.PhoneNo)
 		if err != nil {
 			return nil, err
 		}
 		fmt.Println("Contact From Cash Delete ", err)
+
+		err = authenticationServer.data.CreateUser(ctx, data)
+		if err != nil {
+			return nil, err // If User Already Exist Then Report Inconsistency with cash and database
+		}
+
+		err = authenticationServer.data.DelTemporaryUserFromCash(ctx, token.Audience)
+		if err != nil {
+			return nil, err
+		}
 
 		refreshTok, authTok, err := authenticationServer.data.GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx, token.Audience, true, []int{data_services.LogOut, data_services.GetNewToken, data_services.External})
 		if err != nil {
