@@ -16,8 +16,7 @@ import (
 const (
 	Validation5Min  = time.Minute * 5
 	Validation10Min = time.Minute * 10
-	Validation5Hr   = time.Hour * 5
-	Validation12Hr  = time.Hour * 12
+	Validation15Min = time.Minute * 12
 )
 
 func (dataService *DataServices) GenerateAndSendOTP(ctx context.Context, userId string, phoneNo string, resendTime int32, validTime time.Duration) error {

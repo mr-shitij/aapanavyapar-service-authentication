@@ -83,7 +83,6 @@ func GeneratePassToken(userId string, accessGroup []int) (string, string, error)
 		Expiration: exp,
 		NotBefore:  nbt,
 	}
-	jsonToken.Set("authorized", true)
 	jsonToken.Set("accessGroup", accessGroup)
 	footer := "Powered By AapanaVypar"
 

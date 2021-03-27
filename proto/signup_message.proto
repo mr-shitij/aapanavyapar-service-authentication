@@ -18,10 +18,7 @@ message SignUpRequest {
 }
 
 message SignUpResponse {
-  oneof data {
-    ResponseData responseData = 40;
-    ProblemCode code = 32;
-  }
+  ResponseData responseData = 40;
   bool authorized = 50;
 }
 

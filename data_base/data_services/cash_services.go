@@ -11,6 +11,7 @@ import (
 	"time"
 )
 
+const TemporaryUserContactDetailsCashTiming = time.Hour * 3
 const TemporaryUserDetailsCashTiming = time.Minute * 30
 
 func (dataService *DataServices) LoadUserContactDataInCash(ctx context.Context) error {
@@ -123,7 +124,7 @@ func (dataService *DataServices) SetTempContactToCash(ctx context.Context, key s
 
 	value = helpers.EncodePhoneNo(value.(string))
 	key = helpers.EncodePhoneNo(key)
-	err := dataService.SetDataToCash(ctx, key+"_TEMP_CONTACT", value, TemporaryUserDetailsCashTiming)
+	err := dataService.SetDataToCash(ctx, key+"_TEMP_CONTACT", value, TemporaryUserContactDetailsCashTiming)
 
 	if err != nil {
 		return status.Errorf(codes.Internal, "unable to add temp contact in cash  : %w", err)
@@ -223,11 +224,3 @@ func (dataService *DataServices) DelDataFromCash(ctx context.Context, key string
 
 	return nil
 }
-
-/*
-
-Load the phone and email in cash for fast response
-While creating user only insert authenticated user in database
-In first request insert the details of user in cash and if he/she conforms the details/otp then only insert the record in database.
-
-*/
