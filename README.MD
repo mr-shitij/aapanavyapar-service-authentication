@@ -264,7 +264,12 @@ Response
   - **Unauthenticated**  : Request With Invalid Token   
   - **InvalidArgument**  : Try With Stronger Password   
   - **Internal**         : Fail To Update Password  
-   
+
+### 9. GetNewToken :
+  - **Unauthenticated**  : No API Key Is Specified
+  - **Unauthenticated**  : Request With Invalid Token
+  - **Internal**         : Unable To Generate Token
+  - **InvalidArgument**  : Invalid Token
 
 ## Data Flow's
 
@@ -351,6 +356,12 @@ Response
    2. Validate Auth Token; If token is valid then go to step-3 else send error "UnAuthorized".
    3. Validate Password and if valid then go to step-4 else send error "Try With Stronger Password".
    4. Update Password and status to as a true.
+
+### 9. GetNewToken :
+
+   1. Check For API Key; If API key is valid then go to step-2 else send Error "UnAuthorized Access".
+   2. Validate Refresh Token; If token is valid then go to step-3 else send error "UnAuthorized".
+   3. Generate Auth Token and sent to user.
 
 ## Token Format
     
