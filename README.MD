@@ -432,6 +432,19 @@ All the tokens are signed and encrypted with their own unique key to ensure secu
 - **AccessGroup**: AccessGroup identifies the limits of the token.
 - **Footer**     : Footer is publicly readable to identify token; It represents brand name.
 
+## DataBase Schema
+
+    create table user_data(
+        user_id     varchar       primary key,
+        username    varchar(254)  not null,
+        password    varchar(254)  not null,
+        phone_no    varchar(10)   not null unique,
+        email       varchar(254)  unique,
+        joined_time timestamp     not null,
+        pin_code    varchar(6)    not null
+    );
+
+
 ## Storage Methods
 
 - The refresh token are stored in cash; Key = refresh the token id and Value = refresh token and allocated time. 

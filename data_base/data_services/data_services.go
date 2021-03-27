@@ -16,6 +16,7 @@ import (
 	"os"
 	"strconv"
 	"sync"
+	"time"
 )
 
 type DataServices struct {
@@ -41,7 +42,7 @@ func (dataService *DataServices) CreateUser(ctx context.Context, user *structs.U
 	}
 
 	fmt.Println("Executing Query Now")
-	rows := tx.MustExec("insert into user_data (user_id, username, password, phone_no, email, pin_code) values ($1, $2, $3, $4, $5, $6)", user.UserId, user.Username, user.Password, user.PhoneNo, user.Email, user.PinCode)
+	rows := tx.MustExec("insert into user_data (user_id, username, password, phone_no, email, pin_code, joined_time) values ($1, $2, $3, $4, $5, $6, $7)", user.UserId, user.Username, user.Password, user.PhoneNo, user.Email, user.PinCode, time.Now().UTC())
 
 	affected, err := rows.RowsAffected()
 	if err != nil {

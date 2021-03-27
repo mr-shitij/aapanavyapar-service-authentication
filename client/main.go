@@ -32,8 +32,8 @@ func main() {
 	respSignup, err := server.Signup(context.Background(), &pb.SignUpRequest{
 		Username: "Shitij1",
 		Password: "1234567881",
-		PhoneNo:  "1234567998",
-		Email:    "shitij18@mail.com",
+		PhoneNo:  "1234567999",
+		Email:    "shitij@mail.com",
 		PinCode:  "425107",
 		ApiKey:   os.Getenv("API_KEY_FOR_WEB"),
 	})
@@ -68,7 +68,7 @@ func main() {
 	authentication_services.PrintClaimsOfRefreshToken(respContactConform.GetRefreshToken())
 
 	respIn, err := server.SignIn(context.Background(), &pb.SignInRequest{
-		PhoneNo:  "1234567998",
+		PhoneNo:  "1234567999",
 		Password: "1234567881",
 		ApiKey:   os.Getenv("API_KEY_FOR_WEB"),
 	})
