@@ -99,7 +99,7 @@ Response
 Request
 
     message SignInRequest {
-        string mail = 8;
+        string phoneNo = 8;
         string password = 9;
         string apiKey = 105;
     }
@@ -180,7 +180,7 @@ Response
   - The token is encrypted and then only send to the client.
   - OTP is conformed on server side.
   - Security in structure.
-  - The allocated token are valid upto certain time period depending upon authorized and unauthorized user.
+  - The allocated token are valid upto certain time period depending upon authorized and unauthorized user. 
      **Refresh token for authorized user   = 2 weeks**   
      **Refresh token for unauthorized user = 30 min**
   - The user who tried to signUp and utilized his all OTP tries then he can try again after 3 hours with that contact number.
