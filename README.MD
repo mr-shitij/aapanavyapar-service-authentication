@@ -202,73 +202,73 @@ Response
 
 ## Error Codes
 
-###1. SignUp :
-   - **Unauthenticated** : No API Key Is Specified
-   - **InvalidArgument** : Unable To Validate Provided Inputs
-   - **NotFound**        : User Not Found
-   - **AlreadyExists**   : Process In Progress
-   - **Internal**        : Unable To Generate UUID
-   - **Internal**        : Unable To Generate Hash
-   - **Internal**        : Unable To Add User To Cash
+### 1. SignUp :
+   - **Unauthenticated** : No API Key Is Specified  
+   - **InvalidArgument** : Unable To Validate Provided Inputs   
+   - **NotFound**        : User Not Found   
+   - **AlreadyExists**   : Process In Progress  
+   - **Internal**        : Unable To Generate UUID  
+   - **Internal**        : Unable To Generate Hash  
+   - **Internal**        : Unable To Add User To Cash   
    - **Internal**        : Unable To Add User To Cash Of Waiting users   
-   - **Internal**        : Unable To Generate Refresh Token
-   - **Internal**        : Unable To Send OTP
+   - **Internal**        : Unable To Generate Refresh Token 
+   - **Internal**        : Unable To Send OTP   
 
-###2. SignIn :
-   - **Unauthenticated**  : No API Key Is Specified
-   - **InvalidArgument**  : Unable to Validate Inputs
-   - **AlreadyExists**    : User Already Exist With Same Contact Number
-   - **InvalidArgument**  : Unable to Validate Inputs
-   - **DeadlineExceeded** : Time Out
-   - **PermissionDenied** : Unable To Authenticate
-   - **Internal**         : Unable To Generate Refresh Token
+### 2. SignIn :
+   - **Unauthenticated**  : No API Key Is Specified 
+   - **InvalidArgument**  : Unable to Validate Inputs   
+   - **AlreadyExists**    : User Already Exist With Same Contact Number 
+   - **InvalidArgument**  : Unable to Validate Inputs   
+   - **DeadlineExceeded** : Time Out    
+   - **PermissionDenied** : Unable To Authenticate  
+   - **Internal**         : Unable To Generate Refresh Token    
    
-###3. LogOut :
-   - **Unauthenticated**  : No API Key Is Specified
-   - **Unauthenticated**  : Request With Invalid Token
+### 3. LogOut :
+   - **Unauthenticated**  : No API Key Is Specified 
+   - **Unauthenticated**  : Request With Invalid Token  
 
-###4. ContactConformation :
-   - **Unauthenticated** : No API Key Is Specified
-   - **Unauthenticated** : Request With Invalid Token
-   - **Unknown**         : OTP Token Not Found
-   - **NotFound**        : Please Try Again (So Late For Conforming Contact)
-   - **Aborted**         : Unauthenticated User (OTP Match but Phone Number Not)
-   - **Unknown**         : Unable To Create User
-   - **Internal**        : Unable To Generate Refresh Token (Try To SignIn)
+### 4. ContactConformation :
+   - **Unauthenticated** : No API Key Is Specified  
+   - **Unauthenticated** : Request With Invalid Token   
+   - **Unknown**         : OTP Token Not Found  
+   - **NotFound**        : Please Try Again (So Late For Conforming Contact)    
+   - **Aborted**         : Unauthenticated User (OTP Match but Phone Number Not)    
+   - **Unknown**         : Unable To Create User    
+   - **Internal**        : Unable To Generate Refresh Token (Try To SignIn) 
 
-###5. ResendOTP :
-   - **Unauthenticated**  : No API Key Is Specified
-   - **Unauthenticated**  : Request With Invalid Token
-   - **Unknown**          : OTP Token Not Found
-   - **Internal**         : Unable To Send OTP
-   - **Unknown**          : Unable To Process Request
+### 5. ResendOTP :
+   - **Unauthenticated**  : No API Key Is Specified 
+   - **Unauthenticated**  : Request With Invalid Token  
+   - **Unknown**          : OTP Token Not Found 
+   - **Internal**         : Unable To Send OTP  
+   - **Unknown**          : Unable To Process Request   
 
-###6. ForgetPassword :
-  - **Unauthenticated**  : No API Key Is Specified
-  - **InvalidArgument**  : Unable To Validate Inputs
-  - **PermissionDenied** : Not exist
-  - **Internal**         : Unable To Generate Refresh Token
-  - **Internal**         : Unable To Send OTP
+### 6. ForgetPassword :
+  - **Unauthenticated**  : No API Key Is Specified  
+  - **InvalidArgument**  : Unable To Validate Inputs    
+  - **PermissionDenied** : Not exist    
+  - **Internal**         : Unable To Generate Refresh Token 
+  - **Internal**         : Unable To Send OTP   
    
-###7. ConformForgetPasswordOTP :
-  - **Unauthenticated**  : No API Key Is Specified
-  - **Unauthenticated**  : Request With Invalid Token
-  - **Unauthenticated**  : Request With Invalid Token
-  - **Unauthenticated**  : Request With Invalid Token
-  - **Internal**         : OTP Token Not Found
-  - **Internal**         : Unable To Generate Token
-  - **PermissionDenied** : Invalid OTP To Get Password
+### 7. ConformForgetPasswordOTP :
+  - **Unauthenticated**  : No API Key Is Specified  
+  - **Unauthenticated**  : Request With Invalid Token   
+  - **Unauthenticated**  : Request With Invalid Token   
+  - **Unauthenticated**  : Request With Invalid Token   
+  - **Internal**         : OTP Token Not Found  
+  - **Internal**         : Unable To Generate Token 
+  - **PermissionDenied** : Invalid OTP To Get Password  
 
-###8. SetNewPassword :
-  - **Unauthenticated**  : No API Key Is Specified
-  - **Unauthenticated**  : Request With Invalid Token
-  - **InvalidArgument**  : Try With Stronger Password
-  - **Internal**         : Fail To Update Password
+### 8. SetNewPassword :
+  - **Unauthenticated**  : No API Key Is Specified  
+  - **Unauthenticated**  : Request With Invalid Token   
+  - **InvalidArgument**  : Try With Stronger Password   
+  - **Internal**         : Fail To Update Password  
    
 
 ## Data Flow's
 
-###1. SignUp :
+### 1. SignUp :
    
    1. Check For API Key; If API key is valid then go to step-2 else send Error "UnAuthorized Access". 
    2. Sanitize the inputs provided in the input form the user; If input provided by the user are not valid then send error "Invalid Input" else go to step-3. 
@@ -289,7 +289,7 @@ Response
    **the token from signUp rpc can only access to the following services : GetNewToken, ResendOTP, ConformContact** 
 
 
-###2. SignIn :
+### 2. SignIn :
 
    1. Check For API Key; If API key is valid then go to step-2 else send Error "UnAuthorized Access".
    2. Sanitize the inputs provided in the input form the user; If input provided by the user are not valid then send error "Invalid Input" else go to step-3.
@@ -300,14 +300,14 @@ Response
 
    **the token from signUp rpc can only access to the following services : LogOut, GetNewToken, External**
 
-###3. LogOut :
+### 3. LogOut :
 
    1. Check For API Key; If API key is valid then go to step-2 else send Error "UnAuthorized Access".
    2. Validate Auth Token; If token is valid then go to step-3 else send error "UnAuthorized".
    3. Delete Refresh and Auth token.
    4. On Successful deletion of token send status to true else false.
 
-###4. ContactConformation : 
+### 4. ContactConformation : 
 
    1. Check For API Key; If API key is valid then go to step-2 else send Error "UnAuthorized Access".
    2. Validate Auth Token; If token is valid then go to step-3 else send error "UnAuthorized".
@@ -321,13 +321,13 @@ Response
 
    **the token from signUp rpc can only access to the following services : LogOut, GetNewToken, External**
 
-###5. Resend OTP :
+### 5. Resend OTP :
 
    1. Check For API Key; If API key is valid then go to step-2 else send Error "UnAuthorized Access".
    2. Validate Auth Token; If token is valid then go to step-3 else send error "UnAuthorized".
    3. Get the OTP details from cash and check for resend times of otp and according to that send the otp or send error "Limit Exceeded"
 
-###6. ForgetPassword :
+### 6. ForgetPassword :
 
    1. Check For API Key; If API key is valid then go to step-2 else send Error "UnAuthorized Access".
    2. Sanitize the inputs provided in the input form the user; If input provided by the user are not valid then send error "Invalid Input" else go to step-3.
@@ -336,7 +336,7 @@ Response
    5. Generate and send OTP.
    6. Send Refresh and Auth token for Forget Password.
 
-###7. ConformForgetPasswordOTP :
+### 7. ConformForgetPasswordOTP :
 
    1. Check For API Key; If API key is valid then go to step-2 else send Error "UnAuthorized Access".
    2. Validate Auth Token; If token is valid then go to step-3 else send error "UnAuthorized".
@@ -345,18 +345,18 @@ Response
    5. Delete OTP Data and Refresh token from cash.
    6. Generate Password Token and send.
 
-###8. SetNewPassword :
+### 8. SetNewPassword :
 
    1. Check For API Key; If API key is valid then go to step-2 else send Error "UnAuthorized Access".
    2. Validate Auth Token; If token is valid then go to step-3 else send error "UnAuthorized".
    3. Validate Password and if valid then go to step-4 else send error "Try With Stronger Password".
    4. Update Password and status to as a true.
 
-##Token Format
+## Token Format
     
 All the tokens are signed and encrypted with their own unique key to ensure security.
 
-###1. Refresh Token
+### 1. Refresh Token
 
     Audience    : string,
     Subject     : string,
@@ -379,7 +379,7 @@ All the tokens are signed and encrypted with their own unique key to ensure secu
 - **Footer**     : Footer is publicly readable to identify token; It represents brand name.
 
 
-###2. Auth Token
+### 2. Auth Token
 
     Audience    : string,
     Subject     : string,
@@ -401,7 +401,7 @@ All the tokens are signed and encrypted with their own unique key to ensure secu
 - **AccessGroup**: AccessGroup identifies the limits of the token.
 - **Footer**     : Footer is publicly readable to identify token; It represents brand name.
 
-###3. Password Token
+### 3. Password Token
 
     Audience    : string,
     Subject     : string,
@@ -421,7 +421,7 @@ All the tokens are signed and encrypted with their own unique key to ensure secu
 - **AccessGroup**: AccessGroup identifies the limits of the token.
 - **Footer**     : Footer is publicly readable to identify token; It represents brand name.
 
-##Storage Methods
+## Storage Methods
 
 - The refresh token are stored in cash; Key = refresh the token id and Value = refresh token and allocated time. 
 - The auth token is not stored.
