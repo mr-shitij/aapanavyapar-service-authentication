@@ -30,7 +30,7 @@ Request
         string username = 25;
         string password = 26;
         string phoneNo = 27;
-        string phoneNo = 28;
+        string email = 28;
         string pinCode = 29;
         string apiKey = 106;
 
@@ -205,7 +205,7 @@ Response
 ### 1. SignUp :
    - **Unauthenticated** : No API Key Is Specified  
    - **InvalidArgument** : Unable To Validate Provided Inputs   
-   - **NotFound**        : User Not Found   
+   - **AlreadyExists**   : User Already Exist   
    - **AlreadyExists**   : Process In Progress  
    - **Internal**        : Unable To Generate UUID  
    - **Internal**        : Unable To Generate Hash  
