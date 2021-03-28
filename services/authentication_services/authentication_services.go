@@ -153,7 +153,6 @@ func (authenticationServer *AuthenticationServer) Signup(ctx context.Context, re
 		Password: string(hashedPassword),
 		PhoneNo:  user.GetPhoneNo(),
 		Email:    user.GetEmail(),
-		PinCode:  user.GetPinCode(),
 	})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Unable To Add User To Cash")

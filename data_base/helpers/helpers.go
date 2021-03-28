@@ -107,16 +107,12 @@ func SanitizeAndValidate(user *pb.SignUpRequest) (*pb.SignUpRequest, error) {
 	if user.Password, err = SanitizeAndValidatePassword(user.Password); err != nil {
 		return nil, err
 	}
-	if user.PinCode, err = SanitizeAndValidatePinCode(user.PinCode); err != nil {
-		return nil, err
-	}
 
 	return &pb.SignUpRequest{
 		Username: user.Username,
 		Password: user.Password,
 		PhoneNo:  user.PhoneNo,
 		Email:    user.Email,
-		PinCode:  user.PinCode,
 	}, nil
 }
 

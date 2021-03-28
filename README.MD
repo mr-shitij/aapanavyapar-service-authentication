@@ -440,8 +440,7 @@ All the tokens are signed and encrypted with their own unique key to ensure secu
         password    varchar(254)  not null,
         phone_no    varchar(10)   not null unique,
         email       varchar(254)  unique,
-        joined_time timestamp     not null,
-        pin_code    varchar(6)    not null
+        joined_time timestamp     not null
     );
 
 
