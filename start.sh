@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 export $(grep -v '^#' .env | xargs)
 
@@ -18,7 +18,7 @@ echo $DBHost
 
 ./wait-for-it.sh -h $DBHost -p 5432 -t 50 -- echo "PostGres Is Up"
 
-sleep 50
+sleep 30
 
 ./wait-for-it.sh -h $DBHost -p 5432 -t 30 -- echo "PostGres Is Up"
 

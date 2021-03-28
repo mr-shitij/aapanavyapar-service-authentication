@@ -3,12 +3,13 @@ package main
 import (
 	"aapanavyapar_service_authentication/pb"
 	"aapanavyapar_service_authentication/services/authentication_services"
-	"context"
 	"flag"
 	"fmt"
 	"github.com/joho/godotenv"
+	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"log"
+	"os"
 )
 
 func main() {
@@ -31,49 +32,45 @@ func main() {
 	respSignup, err := server.Signup(context.Background(), &pb.SignUpRequest{
 		Username: "Shitij1",
 		Password: "1234567881",
-		PhoneNo:  "1234567998",
-		Email:    "shitij18@mail.com",
+		PhoneNo:  "1234567999",
+		Email:    "shitij@mail.com",
 		PinCode:  "425107",
+		ApiKey:   os.Getenv("API_KEY_FOR_WEB"),
 	})
 
 	if err != nil {
 		panic(err)
 	}
 
-	switch respSignup.Data.(type) {
-	case *pb.SignUpResponse_ResponseData:
-		responseData := respSignup.Data.(*pb.SignUpResponse_ResponseData)
+	fmt.Println("Token Of Signup : ")
+	authentication_services.PrintClaimsOfAuthToken(respSignup.GetResponseData().GetToken())
 
-		fmt.Println("Token Of Signup : ")
-		authentication_services.PrintClaimsOfAuthToken(responseData.ResponseData.GetToken())
+	fmt.Println("Refresh Token Of Signup : ")
+	authentication_services.PrintClaimsOfRefreshToken(respSignup.GetResponseData().GetRefreshToken())
 
-		fmt.Println("Refresh Token Of Signup : ")
-		authentication_services.PrintClaimsOfRefreshToken(responseData.ResponseData.GetRefreshToken())
+	var otp string
+	fmt.Println("Enter OTP : ")
+	_, _ = fmt.Scanln(&otp)
 
-		respContactConform, err := server.ContactConformation(context.Background(), &pb.ContactConformationRequest{
-			Token: responseData.ResponseData.GetToken(),
-			Otp:   "12345",
-		})
+	respContactConform, err := server.ContactConformation(context.Background(), &pb.ContactConformationRequest{
+		Token:  respSignup.GetResponseData().GetToken(),
+		Otp:    otp,
+		ApiKey: os.Getenv("API_KEY_FOR_WEB"),
+	})
 
-		if err != nil {
-			panic(err)
-		}
-
-		fmt.Println("Contact Conform Auth Token Of Signup : ")
-		authentication_services.PrintClaimsOfAuthToken(respContactConform.GetToken())
-		fmt.Println("Contact Conform Refresh Token Of Signup : ")
-		authentication_services.PrintClaimsOfRefreshToken(respContactConform.GetRefreshToken())
-
-		break
-	case *pb.SignUpResponse_Code:
-		responseData := respSignup.Data.(*pb.SignUpResponse_Code)
-		fmt.Println("Signup Response Code Data : ", responseData.Code)
-		break
+	if err != nil {
+		panic(err)
 	}
 
-	respIn, err := server.SignInWithMail(context.Background(), &pb.SignInForMailBaseRequest{
-		Mail:     "shitij18@mail.com",
+	fmt.Println("Contact Conform Auth Token Of Signup : ")
+	authentication_services.PrintClaimsOfAuthToken(respContactConform.GetToken())
+	fmt.Println("Contact Conform Refresh Token Of Signup : ")
+	authentication_services.PrintClaimsOfRefreshToken(respContactConform.GetRefreshToken())
+
+	respIn, err := server.SignIn(context.Background(), &pb.SignInRequest{
+		PhoneNo:  "1234567999",
 		Password: "1234567881",
+		ApiKey:   os.Getenv("API_KEY_FOR_WEB"),
 	})
 
 	if err != nil {
@@ -171,7 +168,7 @@ func main() {
 //}
 //
 //
-//data, err := db.GetContactListDataFormCash(context.Background(), "1234567948")
+//data, err := db.GetContactListDataFromCash(context.Background(), "1234567948")
 //if err != nil {
 //	fmt.Println("Get User : ", err)
 //}
@@ -184,7 +181,7 @@ func main() {
 //}
 //
 //
-//data, err = db.GetContactListDataFormCash(context.Background(), "1234567998")
+//data, err = db.GetContactListDataFromCash(context.Background(), "1234567998")
 //if err != nil {
 //	fmt.Println("Get User : ", err)
 //}

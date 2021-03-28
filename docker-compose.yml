@@ -29,7 +29,6 @@ services:
     container_name: pg_admmin
     networks:
       aappanavypar-frountend:
-      aappanavypar-backend:
 
 
   redis:
@@ -61,6 +60,5 @@ services:
 # Custom network so all services can communicate using a FQDN
 networks:
     aappanavypar-frountend:
-
     aappanavypar-backend:
 

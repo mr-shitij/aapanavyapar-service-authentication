@@ -6,6 +6,7 @@ option java_package = "com.aapanavyapar.aapanavyapar.services";
 
 
 message newTokenRequest {
+  string apiKey = 109;
   string refreshToken = 21;
 }
 

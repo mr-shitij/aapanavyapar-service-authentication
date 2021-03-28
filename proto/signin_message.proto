@@ -7,14 +7,12 @@ option java_package = "com.aapanavyapar.aapanavyapar.services";
 
 import "common_message.proto";
 
-message SignInForMailBaseRequest {
-  string mail = 8;
+message SignInRequest {
+  string apiKey = 105;
+  string phoneNo = 8;
   string password = 9;
 }
 
-message SignInForMailBaseResponse {
-    oneof data{
+message SignInResponse {
       ResponseData responseData = 10;
-      ProblemCode code = 11;
-    }
 }

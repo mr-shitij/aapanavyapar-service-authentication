@@ -83,7 +83,6 @@ func GeneratePassToken(userId string, accessGroup []int) (string, string, error)
 		Expiration: exp,
 		NotBefore:  nbt,
 	}
-	jsonToken.Set("authorized", true)
 	jsonToken.Set("accessGroup", accessGroup)
 	footer := "Powered By AapanaVypar"
 
@@ -147,7 +146,7 @@ func (dataService *DataServices) GeneratePassTokenAndAddToCash(ctx context.Conte
 
 func (dataService *DataServices) ValidateRefreshTokenAndGenerateNewAuthToken(ctx context.Context, tokenString string, receivedRefreshToken *paseto.JSONToken) (bool, string, error) {
 
-	val, err := dataService.GetDataFormCash(ctx, receivedRefreshToken.Subject)
+	val, err := dataService.GetDataFromCash(ctx, receivedRefreshToken.Subject)
 	if err != nil {
 		return false, "", err
 	}
@@ -269,7 +268,7 @@ func (dataService *DataServices) ValidateToken(ctx context.Context, tokenString,
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid Argument ", err)
 	}
 
-	_, err = dataService.GetDataFormCash(ctx, receivedToken.Subject)
+	_, err = dataService.GetDataFromCash(ctx, receivedToken.Subject)
 	if err != nil {
 		return nil, err
 	}

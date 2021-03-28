@@ -11,6 +11,7 @@ import (
 	"time"
 )
 
+const TemporaryUserContactDetailsCashTiming = time.Hour * 3
 const TemporaryUserDetailsCashTiming = time.Minute * 30
 
 func (dataService *DataServices) LoadUserContactDataInCash(ctx context.Context) error {
@@ -51,7 +52,7 @@ func (dataService *DataServices) CreateTemporaryUserInCash(ctx context.Context, 
 
 func (dataService *DataServices) GetTemporaryUserFromCash(ctx context.Context, id string) (*structs.UserData, error) {
 
-	val, err := dataService.GetDataFormCash(ctx, id+"_Temp")
+	val, err := dataService.GetDataFromCash(ctx, id+"_Temp")
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +63,17 @@ func (dataService *DataServices) GetTemporaryUserFromCash(ctx context.Context, i
 	return &data, nil
 }
 
-func (dataService *DataServices) GetContactListDataFormCash(ctx context.Context, phoNo string) (string, error) {
+func (dataService *DataServices) DelTemporaryUserFromCash(ctx context.Context, id string) error {
+
+	err := dataService.DelDataFromCash(ctx, id+"_Temp")
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+
+func (dataService *DataServices) GetContactListDataFromCash(ctx context.Context, phoNo string) (string, error) {
 
 	phoNo = helpers.EncodePhoneNo(phoNo)
 	val, err := dataService.GetHashDataFromCash(ctx, "contact", phoNo)
@@ -87,6 +98,46 @@ func (dataService *DataServices) SetContactListDataToCash(ctx context.Context, k
 
 	if err != nil {
 		return status.Errorf(codes.Internal, "unable to add contact to hash in cash  : %w", err)
+	}
+
+	return nil
+}
+
+func (dataService *DataServices) GetTempContactFromCash(ctx context.Context, phoNo string) (string, error) {
+
+	phoNo = helpers.EncodePhoneNo(phoNo)
+	val, err := dataService.GetDataFromCash(ctx, phoNo+"_TEMP_CONTACT")
+
+	val, err = helpers.DecodePhoneNo(val)
+	if err != nil {
+		return "", err
+	}
+
+	if val == "" {
+		return "", status.Errorf(codes.NotFound, "No Data Found")
+	}
+
+	return val, nil
+}
+
+func (dataService *DataServices) SetTempContactToCash(ctx context.Context, key string, value interface{}) error {
+
+	value = helpers.EncodePhoneNo(value.(string))
+	key = helpers.EncodePhoneNo(key)
+	err := dataService.SetDataToCash(ctx, key+"_TEMP_CONTACT", value, TemporaryUserContactDetailsCashTiming)
+
+	if err != nil {
+		return status.Errorf(codes.Internal, "unable to add temp contact in cash  : %w", err)
+	}
+
+	return nil
+}
+
+func (dataService *DataServices) DelTempContactFromCash(ctx context.Context, key string) error {
+
+	err := dataService.DelDataFromCash(ctx, key+"_TEMP_CONTACT")
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -133,7 +184,9 @@ func (dataService *DataServices) DelHashDataFromCash(ctx context.Context, hashId
 	return nil
 }
 
-func (dataService *DataServices) GetDataFormCash(ctx context.Context, key string) (string, error) {
+func (dataService *DataServices) GetDataFromCash(ctx context.Context, key string) (string, error) {
+
+	fmt.Println("Searching Data For : " + key + " in cash")
 
 	val, err := dataService.Cash.Get(ctx, key).Result()
 
@@ -152,15 +205,16 @@ func (dataService *DataServices) GetDataFormCash(ctx context.Context, key string
 func (dataService *DataServices) SetDataToCash(ctx context.Context, key string, value interface{}, expiration time.Duration) error {
 
 	err := dataService.Cash.Set(ctx, key, value, expiration).Err()
-
 	if err != nil {
 		return status.Errorf(codes.Internal, "unable to add data to cash  : %w", err)
 	}
 
+	fmt.Println("Adding Data For : " + key + " in cash")
+
 	return nil
 }
 
-func (dataService *DataServices) DelDataFormCash(ctx context.Context, key string) error {
+func (dataService *DataServices) DelDataFromCash(ctx context.Context, key string) error {
 
 	err := dataService.Cash.Del(ctx, key).Err()
 
@@ -170,11 +224,3 @@ func (dataService *DataServices) DelDataFormCash(ctx context.Context, key string
 
 	return nil
 }
-
-/*
-
-Load the phone and email in cash for fast response
-While creating user only insert authenticated user in database
-In first request insert the details of user in cash and if he/she conforms the details/otp then only insert the record in database.
-
-*/

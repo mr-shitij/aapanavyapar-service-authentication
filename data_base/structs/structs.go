@@ -12,7 +12,6 @@ type UserData struct {
 	Password string `json:"password" db:"password"`
 	PhoneNo  string `json:"phone_no" db:"phone_no"`
 	Email    string `json:"email" db:"email"`
-	PinCode  string `json:"pin_code" db:"pin_code"`
 }
 
 type RefreshTokenCashData struct {

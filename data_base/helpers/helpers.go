@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"log"
+	"os"
 	"regexp"
 	"strings"
 )
@@ -24,6 +25,13 @@ func ContextError(ctx context.Context) error {
 	default:
 		return nil
 	}
+}
+
+func CheckForAPIKey(toTestKey string) bool {
+	if toTestKey == os.Getenv("API_KEY_FOR_MOBILE") || toTestKey == os.Getenv("API_KEY_FOR_WEB") {
+		return true
+	}
+	return false
 }
 
 func SanitizeAndValidateUserName(userName string) (string, error) {
@@ -99,16 +107,12 @@ func SanitizeAndValidate(user *pb.SignUpRequest) (*pb.SignUpRequest, error) {
 	if user.Password, err = SanitizeAndValidatePassword(user.Password); err != nil {
 		return nil, err
 	}
-	if user.PinCode, err = SanitizeAndValidatePinCode(user.PinCode); err != nil {
-		return nil, err
-	}
 
 	return &pb.SignUpRequest{
 		Username: user.Username,
 		Password: user.Password,
 		PhoneNo:  user.PhoneNo,
 		Email:    user.Email,
-		PinCode:  user.PinCode,
 	}, nil
 }
 

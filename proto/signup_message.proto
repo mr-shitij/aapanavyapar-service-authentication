@@ -9,23 +9,20 @@ import "common_message.proto";
 import "google/protobuf/duration.proto";
 
 message SignUpRequest {
+  string apiKey = 106;
   string username = 25;
   string password = 26;
   string phoneNo = 27;
   string email = 28;
-  string pinCode = 29;
 }
 
 message SignUpResponse {
-
-  oneof data {
-    ResponseData responseData = 40;
-    ProblemCode code = 32;
-  }
+  ResponseData responseData = 40;
   bool authorized = 50;
 }
 
 message ContactConformationRequest {
+  string apiKey = 107;
   string token = 33;
   string otp = 34;
 }
@@ -36,6 +33,7 @@ message ContactConformationResponse {
 }
 
 message ResendOTPRequest {
+  string apiKey = 108;
   string token = 54;
 }
 

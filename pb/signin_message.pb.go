@@ -20,17 +20,18 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type SignInForMailBaseRequest struct {
+type SignInRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Mail     string `protobuf:"bytes,8,opt,name=mail,proto3" json:"mail,omitempty"`
+	ApiKey   string `protobuf:"bytes,105,opt,name=apiKey,proto3" json:"apiKey,omitempty"`
+	PhoneNo  string `protobuf:"bytes,8,opt,name=phoneNo,proto3" json:"phoneNo,omitempty"`
 	Password string `protobuf:"bytes,9,opt,name=password,proto3" json:"password,omitempty"`
 }
 
-func (x *SignInForMailBaseRequest) Reset() {
-	*x = SignInForMailBaseRequest{}
+func (x *SignInRequest) Reset() {
+	*x = SignInRequest{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_signin_message_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -38,13 +39,13 @@ func (x *SignInForMailBaseRequest) Reset() {
 	}
 }
 
-func (x *SignInForMailBaseRequest) String() string {
+func (x *SignInRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SignInForMailBaseRequest) ProtoMessage() {}
+func (*SignInRequest) ProtoMessage() {}
 
-func (x *SignInForMailBaseRequest) ProtoReflect() protoreflect.Message {
+func (x *SignInRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_signin_message_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -56,38 +57,42 @@ func (x *SignInForMailBaseRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SignInForMailBaseRequest.ProtoReflect.Descriptor instead.
-func (*SignInForMailBaseRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use SignInRequest.ProtoReflect.Descriptor instead.
+func (*SignInRequest) Descriptor() ([]byte, []int) {
 	return file_signin_message_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *SignInForMailBaseRequest) GetMail() string {
+func (x *SignInRequest) GetApiKey() string {
 	if x != nil {
-		return x.Mail
+		return x.ApiKey
 	}
 	return ""
 }
 
-func (x *SignInForMailBaseRequest) GetPassword() string {
+func (x *SignInRequest) GetPhoneNo() string {
+	if x != nil {
+		return x.PhoneNo
+	}
+	return ""
+}
+
+func (x *SignInRequest) GetPassword() string {
 	if x != nil {
 		return x.Password
 	}
 	return ""
 }
 
-type SignInForMailBaseResponse struct {
+type SignInResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Types that are assignable to Data:
-	//	*SignInForMailBaseResponse_ResponseData
-	//	*SignInForMailBaseResponse_Code
-	Data isSignInForMailBaseResponse_Data `protobuf_oneof:"data"`
+	ResponseData *ResponseData `protobuf:"bytes,10,opt,name=responseData,proto3" json:"responseData,omitempty"`
 }
 
-func (x *SignInForMailBaseResponse) Reset() {
-	*x = SignInForMailBaseResponse{}
+func (x *SignInResponse) Reset() {
+	*x = SignInResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_signin_message_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -95,13 +100,13 @@ func (x *SignInForMailBaseResponse) Reset() {
 	}
 }
 
-func (x *SignInForMailBaseResponse) String() string {
+func (x *SignInResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SignInForMailBaseResponse) ProtoMessage() {}
+func (*SignInResponse) ProtoMessage() {}
 
-func (x *SignInForMailBaseResponse) ProtoReflect() protoreflect.Message {
+func (x *SignInResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_signin_message_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -113,70 +118,38 @@ func (x *SignInForMailBaseResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SignInForMailBaseResponse.ProtoReflect.Descriptor instead.
-func (*SignInForMailBaseResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use SignInResponse.ProtoReflect.Descriptor instead.
+func (*SignInResponse) Descriptor() ([]byte, []int) {
 	return file_signin_message_proto_rawDescGZIP(), []int{1}
 }
 
-func (m *SignInForMailBaseResponse) GetData() isSignInForMailBaseResponse_Data {
-	if m != nil {
-		return m.Data
-	}
-	return nil
-}
-
-func (x *SignInForMailBaseResponse) GetResponseData() *ResponseData {
-	if x, ok := x.GetData().(*SignInForMailBaseResponse_ResponseData); ok {
+func (x *SignInResponse) GetResponseData() *ResponseData {
+	if x != nil {
 		return x.ResponseData
 	}
 	return nil
 }
-
-func (x *SignInForMailBaseResponse) GetCode() ProblemCode {
-	if x, ok := x.GetData().(*SignInForMailBaseResponse_Code); ok {
-		return x.Code
-	}
-	return ProblemCode_NoUserNameIsProvided
-}
-
-type isSignInForMailBaseResponse_Data interface {
-	isSignInForMailBaseResponse_Data()
-}
-
-type SignInForMailBaseResponse_ResponseData struct {
-	ResponseData *ResponseData `protobuf:"bytes,10,opt,name=responseData,proto3,oneof"`
-}
-
-type SignInForMailBaseResponse_Code struct {
-	Code ProblemCode `protobuf:"varint,11,opt,name=code,proto3,enum=ProblemCode,oneof"`
-}
-
-func (*SignInForMailBaseResponse_ResponseData) isSignInForMailBaseResponse_Data() {}
-
-func (*SignInForMailBaseResponse_Code) isSignInForMailBaseResponse_Data() {}
 
 var File_signin_message_proto protoreflect.FileDescriptor
 
 var file_signin_message_proto_rawDesc = []byte{
 	0x0a, 0x14, 0x73, 0x69, 0x67, 0x6e, 0x69, 0x6e, 0x5f, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65,
 	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x14, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x5f, 0x6d,
-	0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x4a, 0x0a, 0x18,
-	0x53, 0x69, 0x67, 0x6e, 0x49, 0x6e, 0x46, 0x6f, 0x72, 0x4d, 0x61, 0x69, 0x6c, 0x42, 0x61, 0x73,
-	0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x6d, 0x61, 0x69, 0x6c,
-	0x18, 0x08, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6d, 0x61, 0x69, 0x6c, 0x12, 0x1a, 0x0a, 0x08,
-	0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x18, 0x09, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08,
-	0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x22, 0x7c, 0x0a, 0x19, 0x53, 0x69, 0x67, 0x6e,
-	0x49, 0x6e, 0x46, 0x6f, 0x72, 0x4d, 0x61, 0x69, 0x6c, 0x42, 0x61, 0x73, 0x65, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x33, 0x0a, 0x0c, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x44, 0x61, 0x74, 0x61, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0d, 0x2e, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x44, 0x61, 0x74, 0x61, 0x48, 0x00, 0x52, 0x0c, 0x72, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x44, 0x61, 0x74, 0x61, 0x12, 0x22, 0x0a, 0x04, 0x63, 0x6f,
-	0x64, 0x65, 0x18, 0x0b, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x0c, 0x2e, 0x50, 0x72, 0x6f, 0x62, 0x6c,
-	0x65, 0x6d, 0x43, 0x6f, 0x64, 0x65, 0x48, 0x00, 0x52, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x42, 0x06,
-	0x0a, 0x04, 0x64, 0x61, 0x74, 0x61, 0x42, 0x30, 0x0a, 0x26, 0x63, 0x6f, 0x6d, 0x2e, 0x61, 0x61,
-	0x70, 0x61, 0x6e, 0x61, 0x76, 0x79, 0x61, 0x70, 0x61, 0x72, 0x2e, 0x61, 0x61, 0x70, 0x61, 0x6e,
-	0x61, 0x76, 0x79, 0x61, 0x70, 0x61, 0x72, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x73,
-	0x50, 0x01, 0x5a, 0x04, 0x2e, 0x3b, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x5d, 0x0a, 0x0d,
+	0x53, 0x69, 0x67, 0x6e, 0x49, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x16, 0x0a,
+	0x06, 0x61, 0x70, 0x69, 0x4b, 0x65, 0x79, 0x18, 0x69, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x61,
+	0x70, 0x69, 0x4b, 0x65, 0x79, 0x12, 0x18, 0x0a, 0x07, 0x70, 0x68, 0x6f, 0x6e, 0x65, 0x4e, 0x6f,
+	0x18, 0x08, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x70, 0x68, 0x6f, 0x6e, 0x65, 0x4e, 0x6f, 0x12,
+	0x1a, 0x0a, 0x08, 0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x18, 0x09, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x08, 0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x22, 0x43, 0x0a, 0x0e, 0x53,
+	0x69, 0x67, 0x6e, 0x49, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x31, 0x0a,
+	0x0c, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x44, 0x61, 0x74, 0x61, 0x18, 0x0a, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x0d, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x44, 0x61,
+	0x74, 0x61, 0x52, 0x0c, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x44, 0x61, 0x74, 0x61,
+	0x42, 0x30, 0x0a, 0x26, 0x63, 0x6f, 0x6d, 0x2e, 0x61, 0x61, 0x70, 0x61, 0x6e, 0x61, 0x76, 0x79,
+	0x61, 0x70, 0x61, 0x72, 0x2e, 0x61, 0x61, 0x70, 0x61, 0x6e, 0x61, 0x76, 0x79, 0x61, 0x70, 0x61,
+	0x72, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x73, 0x50, 0x01, 0x5a, 0x04, 0x2e, 0x3b,
+	0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -193,19 +166,17 @@ func file_signin_message_proto_rawDescGZIP() []byte {
 
 var file_signin_message_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_signin_message_proto_goTypes = []interface{}{
-	(*SignInForMailBaseRequest)(nil),  // 0: SignInForMailBaseRequest
-	(*SignInForMailBaseResponse)(nil), // 1: SignInForMailBaseResponse
-	(*ResponseData)(nil),              // 2: ResponseData
-	(ProblemCode)(0),                  // 3: ProblemCode
+	(*SignInRequest)(nil),  // 0: SignInRequest
+	(*SignInResponse)(nil), // 1: SignInResponse
+	(*ResponseData)(nil),   // 2: ResponseData
 }
 var file_signin_message_proto_depIdxs = []int32{
-	2, // 0: SignInForMailBaseResponse.responseData:type_name -> ResponseData
-	3, // 1: SignInForMailBaseResponse.code:type_name -> ProblemCode
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	2, // 0: SignInResponse.responseData:type_name -> ResponseData
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_signin_message_proto_init() }
@@ -216,7 +187,7 @@ func file_signin_message_proto_init() {
 	file_common_message_proto_init()
 	if !protoimpl.UnsafeEnabled {
 		file_signin_message_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SignInForMailBaseRequest); i {
+			switch v := v.(*SignInRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -228,7 +199,7 @@ func file_signin_message_proto_init() {
 			}
 		}
 		file_signin_message_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SignInForMailBaseResponse); i {
+			switch v := v.(*SignInResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -239,10 +210,6 @@ func file_signin_message_proto_init() {
 				return nil
 			}
 		}
-	}
-	file_signin_message_proto_msgTypes[1].OneofWrappers = []interface{}{
-		(*SignInForMailBaseResponse_ResponseData)(nil),
-		(*SignInForMailBaseResponse_Code)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
