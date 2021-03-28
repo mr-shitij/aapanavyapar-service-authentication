@@ -31,7 +31,6 @@ Request
         string password = 26;
         string phoneNo = 27;
         string email = 28;
-        string pinCode = 29;
         string apiKey = 106;
 
     }  
