@@ -25,7 +25,7 @@ const (
 	PassTokenExpiry = time.Minute * 5
 )
 
-func GenerateRefreshToken(userId string, authorized bool, accessGroup []int) (string, string, error) {
+func GenerateRefreshToken(userId string, userName string, authorized bool, accessGroup []int) (string, string, error) {
 
 	now := time.Now()
 
@@ -44,7 +44,8 @@ func GenerateRefreshToken(userId string, authorized bool, accessGroup []int) (st
 
 	jsonToken := paseto.JSONToken{
 		Audience:   userId,
-		Subject:    refreshTokenId.String(),
+		Jti:        refreshTokenId.String(),
+		Subject:    userName,
 		Issuer:     os.Getenv("TOKEN_ISSUER"),
 		IssuedAt:   now,
 		Expiration: exp,
@@ -96,9 +97,9 @@ func GeneratePassToken(userId string, accessGroup []int) (string, string, error)
 	return token, passTokenId.String(), nil
 }
 
-func (dataService *DataServices) GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx context.Context, userId string, authorized bool, accessGroup []int) (string, string, error) {
+func (dataService *DataServices) GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx context.Context, userId string, userName string, authorized bool, accessGroup []int) (string, string, error) {
 
-	token, refreshTokenId, err := GenerateRefreshToken(userId, authorized, accessGroup)
+	token, refreshTokenId, err := GenerateRefreshToken(userId, userName, authorized, accessGroup)
 
 	cashData := structs.RefreshTokenCashData{
 		RefreshToken:   token,
@@ -115,7 +116,7 @@ func (dataService *DataServices) GenerateRefreshAndAuthTokenAndAddRefreshToCash(
 		return "", "", err
 	}
 
-	authToken, err := GenerateAuthToken(userId, refreshTokenId, authorized, accessGroup)
+	authToken, err := GenerateAuthToken(userId, userName, refreshTokenId, authorized, accessGroup)
 
 	if err != nil {
 		return "", "", status.Errorf(codes.Internal, "unable to create auth token  : %w", err)
@@ -146,7 +147,7 @@ func (dataService *DataServices) GeneratePassTokenAndAddToCash(ctx context.Conte
 
 func (dataService *DataServices) ValidateRefreshTokenAndGenerateNewAuthToken(ctx context.Context, tokenString string, receivedRefreshToken *paseto.JSONToken) (bool, string, error) {
 
-	val, err := dataService.GetDataFromCash(ctx, receivedRefreshToken.Subject)
+	val, err := dataService.GetDataFromCash(ctx, receivedRefreshToken.Jti)
 	if err != nil {
 		return false, "", err
 	}
@@ -178,7 +179,7 @@ func (dataService *DataServices) ValidateRefreshTokenAndGenerateNewAuthToken(ctx
 		return false, "", status.Errorf(codes.PermissionDenied, "Token Is Not Valid %v", err)
 	}
 
-	token, err := GenerateAuthToken(receivedRefreshToken.Audience, receivedRefreshToken.Subject, authorized, accessGroup)
+	token, err := GenerateAuthToken(receivedRefreshToken.Audience, receivedRefreshToken.Subject, receivedRefreshToken.Jti, authorized, accessGroup)
 	if err != nil {
 		return false, "", status.Errorf(codes.Internal, "Unable To Create The Token %v", err)
 	}
@@ -189,10 +190,10 @@ func (dataService *DataServices) ValidateRefreshTokenAndGenerateNewAuthToken(ctx
 	}
 
 	if authorized {
-		err = dataService.SetDataToCash(ctx, receivedRefreshToken.Subject,
+		err = dataService.SetDataToCash(ctx, receivedRefreshToken.Jti,
 			tokenCashData.Marshal(), RefreshTokenExpiry)
 	} else {
-		err = dataService.SetDataToCash(ctx, receivedRefreshToken.Subject,
+		err = dataService.SetDataToCash(ctx, receivedRefreshToken.Jti,
 			tokenCashData.Marshal(), RefreshTokenExpiryForUnAuthorized)
 	}
 
@@ -203,7 +204,7 @@ func (dataService *DataServices) ValidateRefreshTokenAndGenerateNewAuthToken(ctx
 	return true, token, nil
 }
 
-func GenerateAuthToken(userId string, refreshTokenId string, authorized bool, accessGroup []int) (string, error) {
+func GenerateAuthToken(userId string, userName string, refreshTokenId string, authorized bool, accessGroup []int) (string, error) {
 
 	now := time.Now()
 	var exp time.Time
@@ -216,7 +217,8 @@ func GenerateAuthToken(userId string, refreshTokenId string, authorized bool, ac
 
 	jsonToken := paseto.JSONToken{
 		Audience:   userId,
-		Subject:    refreshTokenId,
+		Jti:        refreshTokenId,
+		Subject:    userName,
 		Issuer:     os.Getenv("TOKEN_ISSUER"),
 		IssuedAt:   now,
 		Expiration: exp,
@@ -263,12 +265,12 @@ func (dataService *DataServices) ValidateToken(ctx context.Context, tokenString,
 		return nil, status.Errorf(codes.PermissionDenied, "Token Does Not Have Valid Permission To Access Resources %v", err)
 	}
 
-	_, err = uuid.Parse(receivedToken.Subject)
+	_, err = uuid.Parse(receivedToken.Jti)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid Argument ", err)
 	}
 
-	_, err = dataService.GetDataFromCash(ctx, receivedToken.Subject)
+	_, err = dataService.GetDataFromCash(ctx, receivedToken.Jti)
 	if err != nil {
 		return nil, err
 	}

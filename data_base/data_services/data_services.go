@@ -108,29 +108,30 @@ func (dataService *DataServices) isUserAlreadyExist(email string, phNo string) (
 	return true, status.Errorf(codes.Code(pb.ProblemCode_UserAlreadyExist), "User With Provided Email or Phone Number Already Exist") // User Already Exist
 }
 
-func (dataService *DataServices) SignIn(phoneNo string, password string) (string, error) {
+func (dataService *DataServices) SignIn(phoneNo string, password string) (string, string, error) {
 
 	dataService.mutex.Lock()
 	defer dataService.mutex.Unlock()
 
 	type auth struct {
 		Id       string `db:"user_id"`
+		Username string `db:"username"`
 		Password string `db:"password"`
 	}
 
 	var data = auth{}
-	err := dataService.Db.Get(&data, "select user_id, password from user_data where phone_no=$1", phoneNo)
+	err := dataService.Db.Get(&data, "select user_id, username, password from user_data where phone_no=$1", phoneNo)
 	if err != nil {
 		fmt.Println(err)
-		return "", status.Errorf(codes.Code(pb.ProblemCode_InvalidUserCredentials), "Invalid Credentials")
+		return "", "", status.Errorf(codes.Code(pb.ProblemCode_InvalidUserCredentials), "Invalid Credentials")
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(data.Password), []byte(password))
 	if err != nil {
-		return "", status.Errorf(codes.Code(pb.ProblemCode_InvalidPassword), "Invalid Password")
+		return "", "", status.Errorf(codes.Code(pb.ProblemCode_InvalidPassword), "Invalid Password")
 	}
 
-	return data.Id, nil
+	return data.Id, data.Username, nil
 
 }
 

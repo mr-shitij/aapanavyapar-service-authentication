@@ -369,6 +369,7 @@ All the tokens are signed and encrypted with their own unique key to ensure secu
 ### 1. Refresh Token
 
     Audience    : string,
+    Jti         : string,
     Subject     : string,
     Issuer      : string,
     IssuedAt    : time,
@@ -379,7 +380,8 @@ All the tokens are signed and encrypted with their own unique key to ensure secu
     Footer      : string
 
 - **Audience**   : Audience identifies the intended recipients of the token.
-- **Subject**    : Subject is the token id.
+- **Jti**        : Jti is the refresh token id.
+- **Subject**    : Subject is the username.
 - **Issuer**     : Issuer is token issuer id (Domain)
 - **IssuedAt**   : IssuedAt is the time at which the token was issued.
 - **Expiration** : Expiration is a time on or after which the token must not be accepted for processing.
@@ -392,6 +394,7 @@ All the tokens are signed and encrypted with their own unique key to ensure secu
 ### 2. Auth Token
 
     Audience    : string,
+    Jti         : string,
     Subject     : string,
     Issuer      : string,
     IssuedAt    : time,
@@ -402,7 +405,8 @@ All the tokens are signed and encrypted with their own unique key to ensure secu
     Footer      : string
 
 - **Audience**   : Audience identifies the intended recipients of the token.
-- **Subject**    : Subject is the refresh token id.
+- **Jti**        : Jti is the refresh token id.
+- **Subject**    : Subject is the username.
 - **Issuer**     : Issuer is token issuer id (Domain)
 - **IssuedAt**   : IssuedAt is the time at which the token was issued.
 - **Expiration** : Expiration is a time on or after which the token must not be accepted for processing.

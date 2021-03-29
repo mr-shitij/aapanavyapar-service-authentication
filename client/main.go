@@ -32,9 +32,8 @@ func main() {
 	respSignup, err := server.Signup(context.Background(), &pb.SignUpRequest{
 		Username: "Shitij1",
 		Password: "1234567881",
-		PhoneNo:  "1234567999",
+		PhoneNo:  "1234567996",
 		Email:    "shitij@mail.com",
-		PinCode:  "425107",
 		ApiKey:   os.Getenv("API_KEY_FOR_WEB"),
 	})
 
@@ -68,7 +67,7 @@ func main() {
 	authentication_services.PrintClaimsOfRefreshToken(respContactConform.GetRefreshToken())
 
 	respIn, err := server.SignIn(context.Background(), &pb.SignInRequest{
-		PhoneNo:  "1234567999",
+		PhoneNo:  "1234567996",
 		Password: "1234567881",
 		ApiKey:   os.Getenv("API_KEY_FOR_WEB"),
 	})
@@ -81,13 +80,14 @@ func main() {
 	authentication_services.PrintClaimsOfAuthToken(respIn.GetResponseData().GetToken())
 	authentication_services.PrintClaimsOfRefreshToken(respIn.GetResponseData().GetRefreshToken())
 
+	for i := 0; i < 10; i++ {
+		token, err := server.GetNewToken(context.Background(), &pb.NewTokenRequest{RefreshToken: respIn.GetResponseData().GetRefreshToken()})
+		if err != nil {
+			panic(err)
+		}
+		authentication_services.PrintClaimsOfAuthToken(token.GetToken())
+	}
 }
-
-//token, err := server.GetNewToken(context.Background(), &pb.NewTokenRequest{RefreshToken: respIn.GetResponseData().GetRefreshToken()})
-//if err != nil {
-//	panic(err)
-//}
-//authentication_services.PrintClaimsOfAuthToken(token.GetToken())
 
 //for i:=0; i<=5; i++ {
 //	otpResponse, err := server.ResendOTP(context.Background(), &pb.ResendOTPRequest{Token: token.GetToken()})

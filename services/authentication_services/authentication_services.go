@@ -45,6 +45,7 @@ func PrintClaimsOfAuthToken(token string) {
 	} else {
 		fmt.Println("Auth Token")
 		fmt.Println("Audience", newJsonToken.Audience)
+		fmt.Println("Jti : ", newJsonToken.Jti)
 		fmt.Println("Subject : ", newJsonToken.Subject)
 		fmt.Println("Expiration : ", newJsonToken.Expiration)
 		fmt.Println("IssueAt : ", newJsonToken.IssuedAt)
@@ -65,6 +66,7 @@ func PrintClaimsOfRefreshToken(token string) {
 	} else {
 		fmt.Println("Refresh Token")
 		fmt.Println("Audience", newJsonToken.Audience)
+		fmt.Println("Jti : ", newJsonToken.Jti)
 		fmt.Println("Subject : ", newJsonToken.Subject)
 		fmt.Println("Expiration : ", newJsonToken.Expiration)
 		fmt.Println("IssueAt : ", newJsonToken.IssuedAt)
@@ -167,7 +169,7 @@ func (authenticationServer *AuthenticationServer) Signup(ctx context.Context, re
 	fmt.Println("Temp contact to cash is set")
 
 	fmt.Println("Generating Refresh and Auth Token")
-	refreshToken, authToken, err := authenticationServer.data.GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx, userId.String(), false, []int{data_services.GetNewToken, data_services.ResendOTP, data_services.ConformContact})
+	refreshToken, authToken, err := authenticationServer.data.GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx, userId.String(), "", false, []int{data_services.GetNewToken, data_services.ResendOTP, data_services.ConformContact})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Unable To Generate Refresh Token")
 	}
@@ -225,14 +227,14 @@ func (authenticationServer *AuthenticationServer) SignIn(ctx context.Context, re
 	fmt.Println("Sanitization and Validation Completed")
 
 	fmt.Println("Started SignIn Process")
-	userId, err := authenticationServer.data.SignIn(phoneNo, password)
+	userId, userName, err := authenticationServer.data.SignIn(phoneNo, password)
 	if err != nil {
 		return nil, status.Errorf(codes.PermissionDenied, "Unable To Authenticate")
 	}
 	fmt.Println("Completed SignIn Process")
 
 	fmt.Println("Generating token")
-	refreshToken, authToken, err := authenticationServer.data.GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx, userId, true, []int{data_services.LogOut, data_services.GetNewToken, data_services.External})
+	refreshToken, authToken, err := authenticationServer.data.GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx, userId, userName, true, []int{data_services.LogOut, data_services.GetNewToken, data_services.External})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Unable To Generate Refresh Token")
 	}
@@ -259,7 +261,7 @@ func (authenticationServer *AuthenticationServer) Logout(ctx context.Context, re
 		return &pb.LogoutResponse{Status: false}, status.Errorf(codes.Unauthenticated, "Request With Invalid Token")
 	}
 
-	err = authenticationServer.data.DelDataFromCash(ctx, token.Subject) // Do care for refresh token
+	err = authenticationServer.data.DelDataFromCash(ctx, token.Jti) // Do care for refresh token
 	if err != nil {
 		// Token Expired or Internal Discrepancies.
 	}
@@ -312,7 +314,7 @@ func (authenticationServer *AuthenticationServer) ContactConformation(ctx contex
 		}
 		// To Here Extra Check
 
-		err = authenticationServer.data.DelDataFromCash(ctx, token.Subject)
+		err = authenticationServer.data.DelDataFromCash(ctx, token.Jti)
 		if err != nil {
 			// Capture Error When Logging
 			// Inconsistency with cash.
@@ -337,7 +339,7 @@ func (authenticationServer *AuthenticationServer) ContactConformation(ctx contex
 			return nil, status.Errorf(codes.Unknown, "Unable To Create User") // If User Already Exist Then Report Inconsistency with cash and database
 		}
 
-		refreshTok, authTok, err := authenticationServer.data.GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx, token.Audience, true, []int{data_services.LogOut, data_services.GetNewToken, data_services.External})
+		refreshTok, authTok, err := authenticationServer.data.GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx, token.Audience, data.Username, true, []int{data_services.LogOut, data_services.GetNewToken, data_services.External})
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "Unable To Generate Refresh Token")
 		}
@@ -459,7 +461,7 @@ func (authenticationServer *AuthenticationServer) ForgetPassword(ctx context.Con
 		return nil, status.Errorf(codes.PermissionDenied, "Not exist")
 	}
 
-	refreshToken, authToken, err := authenticationServer.data.GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx, id, false, []int{data_services.GetNewToken, data_services.ResendOTP, data_services.ForgetPassword})
+	refreshToken, authToken, err := authenticationServer.data.GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx, id, "", false, []int{data_services.GetNewToken, data_services.ResendOTP, data_services.ForgetPassword})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Unable To Generate Refresh Token")
 	}
@@ -511,7 +513,7 @@ func (authenticationServer *AuthenticationServer) ConformForgetPasswordOTP(ctx c
 
 	if val.OTP == request.GetOtp() {
 
-		err = authenticationServer.data.DelDataFromCash(ctx, token.Subject)
+		err = authenticationServer.data.DelDataFromCash(ctx, token.Jti)
 		if err != nil {
 			// Capture Error When Logging
 			// Inconsistency with cash.

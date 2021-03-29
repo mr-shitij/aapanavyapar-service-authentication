@@ -3,13 +3,15 @@ services:
   postgres:
     image: postgres
     restart: always
+    env_file:
+      - .env
     environment:
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=root
-      - POSTGRES_DB=root
+      - POSTGRES_USER=${DBUser}
+      - POSTGRES_PASSWORD=${DBPassword}
+      - POSTGRES_DB=${DBName}
 
     ports:
-      - "5432:5432"
+      - "${DBPort}:5432"
     volumes:
       - ./docker_postgres_init.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
     container_name: postgres
@@ -29,6 +31,7 @@ services:
     container_name: pg_admmin
     networks:
       aappanavypar-frountend:
+      aappanavypar-backend:
 
 
   redis:
