@@ -1,7 +1,7 @@
 package data_services
 
 import (
-	"aapanavyapar_service_authentication/data_base/structs"
+	"aapanavyapar_service_authentication/data-base/structs"
 	"context"
 	"crypto/rand"
 	"fmt"

@@ -2,7 +2,7 @@ package main
 
 import (
 	"aapanavyapar_service_authentication/pb"
-	"aapanavyapar_service_authentication/services/authentication_services"
+	"aapanavyapar_service_authentication/services/authentication-services"
 	"flag"
 	"fmt"
 	"github.com/joho/godotenv"
@@ -81,7 +81,10 @@ func main() {
 	authentication_services.PrintClaimsOfRefreshToken(respIn.GetResponseData().GetRefreshToken())
 
 	for i := 0; i < 10; i++ {
-		token, err := server.GetNewToken(context.Background(), &pb.NewTokenRequest{RefreshToken: respIn.GetResponseData().GetRefreshToken()})
+		token, err := server.GetNewToken(context.Background(), &pb.NewTokenRequest{
+			RefreshToken: respIn.GetResponseData().GetRefreshToken(),
+			ApiKey:       os.Getenv("API_KEY_FOR_WEB"),
+		})
 		if err != nil {
 			panic(err)
 		}
@@ -112,8 +115,8 @@ func main() {
 //switch respForgot.Data.(type) {
 //case *pb.ForgetPasswordResponse_ResponseData:
 //	responseDataForget := respForgot.Data.(*pb.ForgetPasswordResponse_ResponseData)
-//	authentication_services.PrintClaimsOfAuthToken(responseDataForget.ResponseData.GetToken())
-//	authentication_services.PrintClaimsOfRefreshToken(responseDataForget.ResponseData.GetRefreshToken())
+//	authentication-services.PrintClaimsOfAuthToken(responseDataForget.ResponseData.GetToken())
+//	authentication-services.PrintClaimsOfRefreshToken(responseDataForget.ResponseData.GetRefreshToken())
 //
 //	passToken, err := server.ConformForgetPasswordOTP(context.Background(), &pb.ConformForgetPasswordOTPRequest{
 //		Otp:   "12345",
@@ -144,8 +147,8 @@ func main() {
 //	fmt.Println("SingIn Response : ", respIn)
 //
 //
-//	authentication_services.PrintClaimsOfAuthToken(respIn.GetResponseData().GetToken())
-//	authentication_services.PrintClaimsOfRefreshToken(respIn.GetResponseData().GetRefreshToken())
+//	authentication-services.PrintClaimsOfAuthToken(respIn.GetResponseData().GetToken())
+//	authentication-services.PrintClaimsOfRefreshToken(respIn.GetResponseData().GetRefreshToken())
 //
 //
 //	break
@@ -155,7 +158,7 @@ func main() {
 //	break
 //}
 
-//db := data_services.NewDbConnection()
+//db := data-services.NewDbConnection()
 //err = db.LoadUserContactDataInCash(context.Background())
 //if err != nil {
 //	panic(err)

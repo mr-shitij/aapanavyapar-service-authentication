@@ -6,11 +6,11 @@ option java_package = "com.aapanavyapar.aapanavyapar.services";
 
 
 
-import "signin_message.proto";
-import "signup_message.proto";
-import "token_message.proto";
-import "logout_message.proto";
-import "forget_password_message.proto";
+import "signin-message.proto";
+import "signup-message.proto";
+import "token-message.proto";
+import "logout-message.proto";
+import "forget-password-message.proto";
 
 service Authentication {
   rpc Signup (SignUpRequest) returns (SignUpResponse);

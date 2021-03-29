@@ -1,9 +1,9 @@
 package data_services
 
 import (
-	"aapanavyapar_service_authentication/data_base/config"
-	"aapanavyapar_service_authentication/data_base/helpers"
-	"aapanavyapar_service_authentication/data_base/structs"
+	"aapanavyapar_service_authentication/data-base/config"
+	"aapanavyapar_service_authentication/data-base/helpers"
+	"aapanavyapar_service_authentication/data-base/structs"
 	"aapanavyapar_service_authentication/pb"
 	"context"
 	"fmt"

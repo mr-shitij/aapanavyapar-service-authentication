@@ -1,8 +1,8 @@
 package data_services
 
 import (
-	"aapanavyapar_service_authentication/data_base/helpers"
-	"aapanavyapar_service_authentication/data_base/structs"
+	"aapanavyapar_service_authentication/data-base/helpers"
+	"aapanavyapar_service_authentication/data-base/structs"
 	"context"
 	"fmt"
 	"github.com/go-redis/redis/v8"
