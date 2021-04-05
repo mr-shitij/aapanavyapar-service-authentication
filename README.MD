@@ -234,6 +234,7 @@ Response
    - **Aborted**         : Unauthenticated User (OTP Match but Phone Number Not)    
    - **Unknown**         : Unable To Create User    
    - **Internal**        : Unable To Generate Refresh Token (Try To SignIn) 
+   - **InvalidArgument** : Invalid OTP
 
 ### 5. ResendOTP :
    - **Unauthenticated**  : No API Key Is Specified 
