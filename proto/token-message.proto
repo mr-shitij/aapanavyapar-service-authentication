@@ -5,11 +5,11 @@ option java_multiple_files = true;
 option java_package = "com.aapanavyapar.aapanavyapar.services";
 
 
-message newTokenRequest {
+message NewTokenRequest {
   string apiKey = 109;
   string refreshToken = 21;
 }
 
-message newTokenResponse {
+message NewTokenResponse {
   string token = 22;
 }

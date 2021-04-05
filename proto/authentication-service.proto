@@ -4,8 +4,6 @@ option go_package = ".;pb";
 option java_multiple_files = true;
 option java_package = "com.aapanavyapar.aapanavyapar.services";
 
-
-
 import "signin-message.proto";
 import "signup-message.proto";
 import "token-message.proto";
@@ -17,7 +15,7 @@ service Authentication {
   rpc ContactConformation (ContactConformationRequest) returns (ContactConformationResponse) {};
   rpc ResendOTP (ResendOTPRequest) returns (ResendOTPResponse) {};
 
-  rpc GetNewToken (newTokenRequest) returns (newTokenResponse) {};
+  rpc GetNewToken (NewTokenRequest) returns (NewTokenResponse) {};
   rpc SignIn (SignInRequest) returns (SignInResponse) {};
   rpc Logout (LogoutRequest) returns (LogoutResponse) {};
 

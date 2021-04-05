@@ -216,7 +216,7 @@ Response
 ### 2. SignIn :
    - **Unauthenticated**  : No API Key Is Specified 
    - **InvalidArgument**  : Unable to Validate Inputs   
-   - **AlreadyExists**    : User Already Exist With Same Contact Number 
+   - **NotFound**         : User Not Exist 
    - **InvalidArgument**  : Unable to Validate Inputs   
    - **DeadlineExceeded** : Time Out    
    - **PermissionDenied** : Unable To Authenticate  
