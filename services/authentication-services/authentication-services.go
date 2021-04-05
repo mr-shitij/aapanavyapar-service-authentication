@@ -416,7 +416,7 @@ func (authenticationServer *AuthenticationServer) ResendOTP(ctx context.Context,
 
 		return &pb.ResendOTPResponse{
 			Response:                 pb.OTPResponse_NotOk,
-			TimeToWaitForNextRequest: ptypes.DurationProto(time.Now().Sub(data.Time)),
+			TimeToWaitForNextRequest: ptypes.DurationProto(data_services.Validation5Min.Truncate(time.Now().Sub(data.Time))),
 		}, nil
 
 	case 2:
@@ -434,7 +434,7 @@ func (authenticationServer *AuthenticationServer) ResendOTP(ctx context.Context,
 
 		return &pb.ResendOTPResponse{
 			Response:                 pb.OTPResponse_NotOk,
-			TimeToWaitForNextRequest: ptypes.DurationProto(time.Now().Sub(data.Time)),
+			TimeToWaitForNextRequest: ptypes.DurationProto(data_services.Validation10Min.Truncate(time.Now().Sub(data.Time))),
 		}, nil
 
 	case 3:
@@ -459,6 +459,11 @@ func (authenticationServer *AuthenticationServer) ForgetPassword(ctx context.Con
 	id, err := authenticationServer.data.GetContactListDataFromCash(ctx, phoNo)
 	if err != nil {
 		return nil, status.Errorf(codes.PermissionDenied, "Not exist")
+	}
+
+	_, err = authenticationServer.data.GetDataFromCash(ctx, id)
+	if err == nil {
+		return nil, status.Errorf(codes.AlreadyExists, "OTP Is Already Sent To User")
 	}
 
 	refreshToken, authToken, err := authenticationServer.data.GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx, id, "", false, []int{data_services.GetNewToken, data_services.ResendOTP, data_services.ForgetPassword})

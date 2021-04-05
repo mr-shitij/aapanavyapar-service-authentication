@@ -244,6 +244,7 @@ Response
    - **Unknown**          : Unable To Process Request   
 
 ### 6. ForgetPassword :
+  - **AlreadyExists**    : OTP Is Already Sent To User  
   - **Unauthenticated**  : No API Key Is Specified  
   - **InvalidArgument**  : Unable To Validate Inputs    
   - **PermissionDenied** : Not exist    
