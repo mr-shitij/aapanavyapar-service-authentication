@@ -78,7 +78,7 @@ func GeneratePassToken(userId string, accessGroup []int) (string, string, error)
 
 	jsonToken := paseto.JSONToken{
 		Audience:   userId,
-		Subject:    passTokenId.String(),
+		Jti:        passTokenId.String(),
 		Issuer:     os.Getenv("TOKEN_ISSUER"),
 		IssuedAt:   now,
 		Expiration: exp,
@@ -240,12 +240,15 @@ func GenerateAuthToken(userId string, userName string, refreshTokenId string, au
 func (dataService *DataServices) ValidateToken(ctx context.Context, tokenString, key string, access int) (*paseto.JSONToken, error) {
 	var receivedToken paseto.JSONToken
 	var newFooter string
+
+	fmt.Println("Decrypting Token")
 	err := paseto.Decrypt(tokenString, []byte(key), &receivedToken, &newFooter)
 
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid Token %v", err)
 	}
 
+	fmt.Println("Validating Token")
 	err = receivedToken.Validate(
 		paseto.ValidAt(time.Now()),
 		paseto.IssuedBy(os.Getenv("TOKEN_ISSUER")),
@@ -254,6 +257,7 @@ func (dataService *DataServices) ValidateToken(ctx context.Context, tokenString,
 		return nil, status.Errorf(codes.PermissionDenied, "Invalid Token %v", err)
 	}
 
+	fmt.Println("Checking Access Group For Token")
 	var accessGroup []int
 	err = receivedToken.Get("accessGroup", &accessGroup)
 	fmt.Println("Access Group  : ", accessGroup)
@@ -265,20 +269,26 @@ func (dataService *DataServices) ValidateToken(ctx context.Context, tokenString,
 		return nil, status.Errorf(codes.PermissionDenied, "Token Does Not Have Valid Permission To Access Resources %v", err)
 	}
 
+	fmt.Println("Checking Refresh Token ID Token")
 	_, err = uuid.Parse(receivedToken.Jti)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid Argument ", err)
 	}
 
+	fmt.Println("Checking Token In Cash Token For Normal")
 	_, err = dataService.GetDataFromCash(ctx, receivedToken.Jti)
 	if err != nil {
+		fmt.Println("Checking Token In Cash Token : ", err)
 		return nil, err
 	}
 
+	fmt.Println("Checking User UUID Of Token")
 	_, err = uuid.Parse(receivedToken.Audience)
 	if err != nil {
+		fmt.Println("Checking User UUID Of Token : ", err)
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid Argument ", err)
 	}
 
+	fmt.Println("Done With Token")
 	return &receivedToken, nil
 }

@@ -61,7 +61,7 @@ func (dataService *DataServices) CreateUser(ctx context.Context, user *structs.U
 
 	fmt.Print("Created")
 
-	err = dataService.SetContactListDataToCash(ctx, user.PhoneNo, user.Email)
+	err = dataService.SetContactListDataToCash(ctx, user.PhoneNo, user.UserId)
 	if err != nil {
 		return err
 	}
