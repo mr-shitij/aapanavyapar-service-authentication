@@ -19,8 +19,8 @@ const (
 	AuthTokenExpiry    = 24 * time.Hour  // 1 day
 
 	MaxTokenAttemptForUnAuthorized    = 7
-	RefreshTokenExpiryForUnAuthorized = time.Minute * 30 // 1/2 hours
-	AuthTokenExpiryForUnAuthorized    = time.Minute * 5  // 5 minutes
+	RefreshTokenExpiryForUnAuthorized = time.Hour * 24   // 1 day
+	AuthTokenExpiryForUnAuthorized    = time.Minute * 10 // 10 minutes
 
 	PassTokenExpiry = time.Minute * 5
 )

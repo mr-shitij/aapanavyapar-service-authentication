@@ -436,7 +436,7 @@ func (authenticationServer *AuthenticationServer) ResendOTP(ctx context.Context,
 
 	case 2:
 		if time.Now().Sub(data.Time) >= data_services.Validation10Min {
-			err = authenticationServer.data.GenerateAndSendOTP(ctx, token.Audience, data.PhoneNo, 3, data_services.Validation15Min+data_services.Validation5Min)
+			err = authenticationServer.data.GenerateAndSendOTP(ctx, token.Audience, data.PhoneNo, 3, data_services.Validation1Day)
 			if err != nil {
 				return nil, status.Errorf(codes.Internal, "Unable To Send OTP")
 			}
@@ -452,12 +452,11 @@ func (authenticationServer *AuthenticationServer) ResendOTP(ctx context.Context,
 			TimeToWaitForNextRequest: ptypes.DurationProto(data_services.Validation10Min.Truncate(time.Now().Sub(data.Time))),
 		}, nil
 
-	case 3:
 	default:
+		fmt.Println("You Exhausted Your OTP Limit")
 		return nil, status.Errorf(codes.ResourceExhausted, "You Exhausted Your OTP Limit")
 
 	}
-	return nil, status.Errorf(codes.Unknown, "Unable To Process Request")
 }
 
 func (authenticationServer *AuthenticationServer) ForgetPassword(ctx context.Context, request *pb.ForgetPasswordRequest) (*pb.ForgetPasswordResponse, error) {
