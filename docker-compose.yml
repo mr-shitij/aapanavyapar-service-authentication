@@ -49,7 +49,7 @@ services:
   app:
     build: .
     ports:
-      - "4356:8080"
+      - "4356:4356"
     restart: on-failure
     depends_on:
       - postgres

@@ -81,11 +81,13 @@ func PrintClaimsOfRefreshToken(token string) {
 func (authenticationServer *AuthenticationServer) GetNewToken(ctx context.Context, request *pb.NewTokenRequest) (*pb.NewTokenResponse, error) {
 
 	if !helpers.CheckForAPIKey(request.GetApiKey()) {
+		fmt.Println("GetNewToken : API Key")
 		return nil, status.Errorf(codes.Unauthenticated, "No API Key Is Specified")
 	}
 
 	receivedRefreshToken, err := authenticationServer.data.ValidateToken(ctx, request.GetRefreshToken(), os.Getenv("REFRESH_TOKEN_SECRETE"), data_services.GetNewToken)
 	if err != nil {
+		fmt.Println("GetNewToken : Token Validation")
 		return nil, status.Errorf(codes.Unauthenticated, "Request With Invalid Token")
 	}
 
@@ -355,29 +357,42 @@ func (authenticationServer *AuthenticationServer) ContactConformation(ctx contex
 
 func (authenticationServer *AuthenticationServer) ResendOTP(ctx context.Context, request *pb.ResendOTPRequest) (*pb.ResendOTPResponse, error) {
 
+	fmt.Println("ResendOTP : API Key Checking ")
 	if !helpers.CheckForAPIKey(request.GetApiKey()) {
+		fmt.Println("ResendOTP : API Key")
 		return nil, status.Errorf(codes.Unauthenticated, "No API Key Is Specified")
 	}
 
+	fmt.Println("ResendOTP : Token Validation ")
 	token, err := authenticationServer.data.ValidateToken(ctx, request.GetToken(), os.Getenv("AUTH_TOKEN_SECRETE"), data_services.ResendOTP)
 	if err != nil {
+		fmt.Println("ResendOTP : Validate Token : ", err)
 		return nil, status.Errorf(codes.Unauthenticated, "Request With Invalid Token")
 	}
 
+	fmt.Println("ResendOTP : Authorizing ")
 	// From Here
 	var authorized bool
 	if err = token.Get("authorized", &authorized); err != nil {
+		fmt.Println("ResendOTP : Authorized")
 		return nil, status.Errorf(codes.Unauthenticated, "Request With Invalid Token")
 	}
+
+	fmt.Println("ResendOTP : Checking For Authorized ")
 	if authorized {
+		fmt.Println("ResendOTP : Authorized")
 		return nil, status.Errorf(codes.Unauthenticated, "Request With Invalid Token") // Some Problem occurred Request made with token is of authorized user who has no permission to access this rpc.
 	}
 	// To Here Extra Check.
 
+	fmt.Println("ResendOTP : Checking In Cache ")
 	val, err := authenticationServer.data.GetDataFromCash(ctx, token.Audience)
 	if err != nil {
+		fmt.Println("ResendOTP : Checking In Cache Error :  ", err)
 		return nil, status.Errorf(codes.Unknown, "OTP Token Not Found") // Some Problem Occurred Sent OTP Is Expired Or Not Sent.
 	}
+
+	fmt.Println("ResendOTP : Checking In Cache Done ")
 
 	var data structs.OTPCashData
 	structs.UnmarshalOTPCash([]byte(val), &data)
@@ -391,7 +406,7 @@ func (authenticationServer *AuthenticationServer) ResendOTP(ctx context.Context,
 
 	switch data.ResendTimes {
 	case 0:
-		err = authenticationServer.data.GenerateAndSendOTP(ctx, token.Audience, data.PhoneNo, 1, data_services.Validation5Min)
+		err = authenticationServer.data.GenerateAndSendOTP(ctx, token.Audience, data.PhoneNo, 1, data_services.Validation5Min+data_services.Validation5Min)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "Unable To Send OTP")
 		}
@@ -403,7 +418,7 @@ func (authenticationServer *AuthenticationServer) ResendOTP(ctx context.Context,
 
 	case 1:
 		if time.Now().Sub(data.Time) >= data_services.Validation5Min {
-			err = authenticationServer.data.GenerateAndSendOTP(ctx, token.Audience, data.PhoneNo, 2, data_services.Validation10Min)
+			err = authenticationServer.data.GenerateAndSendOTP(ctx, token.Audience, data.PhoneNo, 2, data_services.Validation10Min+data_services.Validation5Min)
 			if err != nil {
 				return nil, status.Errorf(codes.Internal, "Unable To Send OTP")
 			}
@@ -421,7 +436,7 @@ func (authenticationServer *AuthenticationServer) ResendOTP(ctx context.Context,
 
 	case 2:
 		if time.Now().Sub(data.Time) >= data_services.Validation10Min {
-			err = authenticationServer.data.GenerateAndSendOTP(ctx, token.Audience, data.PhoneNo, 3, data_services.Validation15Min)
+			err = authenticationServer.data.GenerateAndSendOTP(ctx, token.Audience, data.PhoneNo, 3, data_services.Validation15Min+data_services.Validation5Min)
 			if err != nil {
 				return nil, status.Errorf(codes.Internal, "Unable To Send OTP")
 			}
@@ -487,20 +502,24 @@ func (authenticationServer *AuthenticationServer) ForgetPassword(ctx context.Con
 func (authenticationServer *AuthenticationServer) ConformForgetPasswordOTP(ctx context.Context, request *pb.ConformForgetPasswordOTPRequest) (*pb.ConformForgetPasswordOTPResponse, error) {
 
 	if !helpers.CheckForAPIKey(request.GetApiKey()) {
+		fmt.Println("ConformForgetPasswordOTP : API Key")
 		return nil, status.Errorf(codes.Unauthenticated, "No API Key Is Specified")
 	}
 
 	token, err := authenticationServer.data.ValidateToken(ctx, request.GetToken(), os.Getenv("AUTH_TOKEN_SECRETE"), data_services.ForgetPassword)
 	if err != nil {
+		fmt.Println("ConformForgetPasswordOTP : Token Validation")
 		return nil, status.Errorf(codes.Unauthenticated, "Request With Invalid Token")
 	}
 
 	// From Here
 	var authorized bool
 	if err = token.Get("authorized", &authorized); err != nil {
+		fmt.Println("ConformForgetPasswordOTP : Authorized")
 		return nil, status.Errorf(codes.Unauthenticated, "Request With Invalid Token")
 	}
 	if authorized {
+		fmt.Println("ConformForgetPasswordOTP : Authorized")
 		return nil, status.Errorf(codes.Unauthenticated, "Request With Invalid Token")
 	}
 	// To Here Extra Check

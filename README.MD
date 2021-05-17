@@ -2,6 +2,8 @@
 
 This service is created to enable authentication mechanism in AapanaVypar application.
 
+## Note : For Me Add Feature To Count Total No Of SignIn Devices -> Count Total No Of Allocated Refresh Token To A Single User.
+
 ## Services
 
 - **[Signup](#Signup) ( To Create Account ).**

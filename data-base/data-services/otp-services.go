@@ -21,7 +21,7 @@ const (
 
 func (dataService *DataServices) GenerateAndSendOTP(ctx context.Context, userId string, phoneNo string, resendTime int32, validTime time.Duration) error {
 	otp := GenerateOTP()
-	fmt.Println("Sending The Generated OTP : "+otp+" to : ", phoneNo)
+	fmt.Println("Sending The Generated OTP : "+otp+" to : ", phoneNo+"\n\n\n"+validTime.String()+"\n\n")
 	data := &structs.OTPCashData{
 		OTP:         otp,
 		PhoneNo:     phoneNo,
