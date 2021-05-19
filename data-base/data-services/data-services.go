@@ -154,13 +154,8 @@ func NewDbConnection() *DataServices {
 	if err != nil {
 		panic(err)
 	}
-	dbName, _ := strconv.Atoi(os.Getenv("RedisDB"))
 
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     os.Getenv("RedisAddress"),
-		Password: os.Getenv("RedisPassword"), // no password set
-		DB:       dbName,                     // use default DB
-	})
+	rdb := config.InitRedis()
 
 	return &DataServices{
 		Db:   db,
