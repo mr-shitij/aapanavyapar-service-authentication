@@ -6,9 +6,9 @@ option java_package = "com.aapanavyapar.aapanavyapar.services";
 
 
 message LogoutRequest {
-  string apiKey = 104;
-  string token = 36;
+  string apiKey = 52;
+  string token = 53;
 }
 message LogoutResponse{
-  bool status = 37;
+  bool status = 54;
 }
