@@ -5,14 +5,14 @@ option java_multiple_files = true;
 option java_package = "com.aapanavyapar.aapanavyapar.services";
 
 
-import "common_message.proto";
+import "common-message.proto";
 
 message SignInRequest {
-  string apiKey = 105;
-  string phoneNo = 8;
-  string password = 9;
+  string apiKey = 55;
+  string phoneNo = 56;
+  string password = 57;
 }
 
 message SignInResponse {
-      ResponseData responseData = 10;
+      ResponseData responseData = 58;
 }

@@ -3,13 +3,15 @@ services:
   postgres:
     image: postgres
     restart: always
+    env_file:
+      - .env
     environment:
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=root
-      - POSTGRES_DB=root
+      - POSTGRES_USER=${DBUser}
+      - POSTGRES_PASSWORD=${DBPassword}
+      - POSTGRES_DB=${DBName}
 
     ports:
-      - "5432:5432"
+      - "${DBPort}:5432"
     volumes:
       - ./docker_postgres_init.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
     container_name: postgres
@@ -29,16 +31,17 @@ services:
     container_name: pg_admmin
     networks:
       aappanavypar-frountend:
+      aappanavypar-backend:
 
 
-  redis:
-    image: redis
-    restart: on-failure
+  redis_tls_auth:
+    container_name: redis_tls_auth
+    build:
+      context: ./redis-sharding/redis-tls-container/
     ports:
-      - "6379:6379"
-    environment:
-      - REDIS_REPLICATION_MODE=master
-    container_name: redis_cash
+      - "16542:16542"
+    volumes:
+      - ./redis-sharding/redis-tls-container/certs:/etc/certs
     networks:
       aappanavypar-backend:
 
@@ -46,11 +49,11 @@ services:
   app:
     build: .
     ports:
-      - "4356:8080"
+      - "4356:4356"
     restart: on-failure
     depends_on:
       - postgres
-      - redis
+      - redis_tls_auth
     container_name: app
     command: ["./start.sh"]
     networks:

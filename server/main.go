@@ -2,7 +2,7 @@ package main
 
 import (
 	"aapanavyapar_service_authentication/pb"
-	"aapanavyapar_service_authentication/services/authentication_services"
+	"aapanavyapar_service_authentication/services/authentication-services"
 	"fmt"
 	_ "github.com/joho/godotenv/autoload"
 	"google.golang.org/grpc"

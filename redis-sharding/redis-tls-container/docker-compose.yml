@@ -1,0 +1,11 @@
+version: "3.3"
+
+services:
+  redis_tls_auth:
+    container_name: redis_tls_auth
+    build:
+      context: ./
+    ports:
+      - "16542:16542"
+    volumes:
+      - ./certs:/etc/certs

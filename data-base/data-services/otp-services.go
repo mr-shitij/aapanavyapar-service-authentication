@@ -1,7 +1,7 @@
 package data_services
 
 import (
-	"aapanavyapar_service_authentication/data_base/structs"
+	"aapanavyapar_service_authentication/data-base/structs"
 	"context"
 	"crypto/rand"
 	"fmt"
@@ -17,6 +17,7 @@ const (
 	Validation5Min  = time.Minute * 5
 	Validation10Min = time.Minute * 10
 	Validation15Min = time.Minute * 12
+	Validation1Day  = time.Hour * 24
 )
 
 func (dataService *DataServices) GenerateAndSendOTP(ctx context.Context, userId string, phoneNo string, resendTime int32, validTime time.Duration) error {

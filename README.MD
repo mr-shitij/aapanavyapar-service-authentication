@@ -2,6 +2,8 @@
 
 This service is created to enable authentication mechanism in AapanaVypar application.
 
+## Note : For Me Add Feature To Count Total No Of SignIn Devices -> Count Total No Of Allocated Refresh Token To A Single User.
+
 ## Services
 
 - **[Signup](#Signup) ( To Create Account ).**
@@ -216,7 +218,7 @@ Response
 ### 2. SignIn :
    - **Unauthenticated**  : No API Key Is Specified 
    - **InvalidArgument**  : Unable to Validate Inputs   
-   - **AlreadyExists**    : User Already Exist With Same Contact Number 
+   - **NotFound**         : User Not Exist 
    - **InvalidArgument**  : Unable to Validate Inputs   
    - **DeadlineExceeded** : Time Out    
    - **PermissionDenied** : Unable To Authenticate  
@@ -234,6 +236,7 @@ Response
    - **Aborted**         : Unauthenticated User (OTP Match but Phone Number Not)    
    - **Unknown**         : Unable To Create User    
    - **Internal**        : Unable To Generate Refresh Token (Try To SignIn) 
+   - **InvalidArgument** : Invalid OTP
 
 ### 5. ResendOTP :
    - **Unauthenticated**  : No API Key Is Specified 
@@ -243,6 +246,7 @@ Response
    - **Unknown**          : Unable To Process Request   
 
 ### 6. ForgetPassword :
+  - **AlreadyExists**    : OTP Is Already Sent To User  
   - **Unauthenticated**  : No API Key Is Specified  
   - **InvalidArgument**  : Unable To Validate Inputs    
   - **PermissionDenied** : Not exist    
@@ -369,6 +373,7 @@ All the tokens are signed and encrypted with their own unique key to ensure secu
 ### 1. Refresh Token
 
     Audience    : string,
+    Jti         : string,
     Subject     : string,
     Issuer      : string,
     IssuedAt    : time,
@@ -379,7 +384,8 @@ All the tokens are signed and encrypted with their own unique key to ensure secu
     Footer      : string
 
 - **Audience**   : Audience identifies the intended recipients of the token.
-- **Subject**    : Subject is the token id.
+- **Jti**        : Jti is the refresh token id.
+- **Subject**    : Subject is the username.
 - **Issuer**     : Issuer is token issuer id (Domain)
 - **IssuedAt**   : IssuedAt is the time at which the token was issued.
 - **Expiration** : Expiration is a time on or after which the token must not be accepted for processing.
@@ -392,6 +398,7 @@ All the tokens are signed and encrypted with their own unique key to ensure secu
 ### 2. Auth Token
 
     Audience    : string,
+    Jti         : string,
     Subject     : string,
     Issuer      : string,
     IssuedAt    : time,
@@ -402,7 +409,8 @@ All the tokens are signed and encrypted with their own unique key to ensure secu
     Footer      : string
 
 - **Audience**   : Audience identifies the intended recipients of the token.
-- **Subject**    : Subject is the refresh token id.
+- **Jti**        : Jti is the refresh token id.
+- **Subject**    : Subject is the username.
 - **Issuer**     : Issuer is token issuer id (Domain)
 - **IssuedAt**   : IssuedAt is the time at which the token was issued.
 - **Expiration** : Expiration is a time on or after which the token must not be accepted for processing.

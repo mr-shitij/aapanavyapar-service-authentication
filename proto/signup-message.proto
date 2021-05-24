@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+option go_package = ".;pb";
+option java_multiple_files = true;
+option java_package = "com.aapanavyapar.aapanavyapar.services";
+
+
+import "common-message.proto";
+import "google/protobuf/duration.proto";
+
+message SignUpRequest {
+  string apiKey = 59;
+  string username = 60;
+  string password = 61;
+  string phoneNo = 62;
+  string email = 63;
+}
+
+message SignUpResponse {
+  ResponseData responseData = 64;
+  bool authorized = 65;
+}
+
+message ContactConformationRequest {
+  string apiKey = 66;
+  string token = 67;
+  string otp = 68;
+}
+
+message ContactConformationResponse {
+  string token = 69;
+  string refreshToken = 70;
+}
+
+message ResendOTPRequest {
+  string apiKey = 71;
+  string token = 72;
+}
+
+message ResendOTPResponse {
+  OTPResponse response = 73;
+  google.protobuf.Duration timeToWaitForNextRequest = 74;
+}

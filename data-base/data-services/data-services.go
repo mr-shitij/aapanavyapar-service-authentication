@@ -1,9 +1,9 @@
 package data_services
 
 import (
-	"aapanavyapar_service_authentication/data_base/config"
-	"aapanavyapar_service_authentication/data_base/helpers"
-	"aapanavyapar_service_authentication/data_base/structs"
+	"aapanavyapar_service_authentication/data-base/config"
+	"aapanavyapar_service_authentication/data-base/helpers"
+	"aapanavyapar_service_authentication/data-base/structs"
 	"aapanavyapar_service_authentication/pb"
 	"context"
 	"fmt"
@@ -61,7 +61,7 @@ func (dataService *DataServices) CreateUser(ctx context.Context, user *structs.U
 
 	fmt.Print("Created")
 
-	err = dataService.SetContactListDataToCash(ctx, user.PhoneNo, user.Email)
+	err = dataService.SetContactListDataToCash(ctx, user.PhoneNo, user.UserId)
 	if err != nil {
 		return err
 	}
@@ -108,29 +108,30 @@ func (dataService *DataServices) isUserAlreadyExist(email string, phNo string) (
 	return true, status.Errorf(codes.Code(pb.ProblemCode_UserAlreadyExist), "User With Provided Email or Phone Number Already Exist") // User Already Exist
 }
 
-func (dataService *DataServices) SignIn(phoneNo string, password string) (string, error) {
+func (dataService *DataServices) SignIn(phoneNo string, password string) (string, string, error) {
 
 	dataService.mutex.Lock()
 	defer dataService.mutex.Unlock()
 
 	type auth struct {
 		Id       string `db:"user_id"`
+		Username string `db:"username"`
 		Password string `db:"password"`
 	}
 
 	var data = auth{}
-	err := dataService.Db.Get(&data, "select user_id, password from user_data where phone_no=$1", phoneNo)
+	err := dataService.Db.Get(&data, "select user_id, username, password from user_data where phone_no=$1", phoneNo)
 	if err != nil {
 		fmt.Println(err)
-		return "", status.Errorf(codes.Code(pb.ProblemCode_InvalidUserCredentials), "Invalid Credentials")
+		return "", "", status.Errorf(codes.Code(pb.ProblemCode_InvalidUserCredentials), "Invalid Credentials")
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(data.Password), []byte(password))
 	if err != nil {
-		return "", status.Errorf(codes.Code(pb.ProblemCode_InvalidPassword), "Invalid Password")
+		return "", "", status.Errorf(codes.Code(pb.ProblemCode_InvalidPassword), "Invalid Password")
 	}
 
-	return data.Id, nil
+	return data.Id, data.Username, nil
 
 }
 
@@ -153,13 +154,8 @@ func NewDbConnection() *DataServices {
 	if err != nil {
 		panic(err)
 	}
-	dbName, _ := strconv.Atoi(os.Getenv("RedisDB"))
 
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     os.Getenv("RedisAddress"),
-		Password: os.Getenv("RedisPassword"), // no password set
-		DB:       dbName,                     // use default DB
-	})
+	rdb := config.InitRedis()
 
 	return &DataServices{
 		Db:   db,

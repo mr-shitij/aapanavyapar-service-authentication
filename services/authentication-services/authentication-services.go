@@ -1,9 +1,9 @@
 package authentication_services
 
 import (
-	"aapanavyapar_service_authentication/data_base/data_services"
-	"aapanavyapar_service_authentication/data_base/helpers"
-	"aapanavyapar_service_authentication/data_base/structs"
+	"aapanavyapar_service_authentication/data-base/data-services"
+	"aapanavyapar_service_authentication/data-base/helpers"
+	"aapanavyapar_service_authentication/data-base/structs"
 	"aapanavyapar_service_authentication/pb"
 	"context"
 	"fmt"
@@ -45,6 +45,7 @@ func PrintClaimsOfAuthToken(token string) {
 	} else {
 		fmt.Println("Auth Token")
 		fmt.Println("Audience", newJsonToken.Audience)
+		fmt.Println("Jti : ", newJsonToken.Jti)
 		fmt.Println("Subject : ", newJsonToken.Subject)
 		fmt.Println("Expiration : ", newJsonToken.Expiration)
 		fmt.Println("IssueAt : ", newJsonToken.IssuedAt)
@@ -65,6 +66,7 @@ func PrintClaimsOfRefreshToken(token string) {
 	} else {
 		fmt.Println("Refresh Token")
 		fmt.Println("Audience", newJsonToken.Audience)
+		fmt.Println("Jti : ", newJsonToken.Jti)
 		fmt.Println("Subject : ", newJsonToken.Subject)
 		fmt.Println("Expiration : ", newJsonToken.Expiration)
 		fmt.Println("IssueAt : ", newJsonToken.IssuedAt)
@@ -79,11 +81,13 @@ func PrintClaimsOfRefreshToken(token string) {
 func (authenticationServer *AuthenticationServer) GetNewToken(ctx context.Context, request *pb.NewTokenRequest) (*pb.NewTokenResponse, error) {
 
 	if !helpers.CheckForAPIKey(request.GetApiKey()) {
+		fmt.Println("GetNewToken : API Key")
 		return nil, status.Errorf(codes.Unauthenticated, "No API Key Is Specified")
 	}
 
 	receivedRefreshToken, err := authenticationServer.data.ValidateToken(ctx, request.GetRefreshToken(), os.Getenv("REFRESH_TOKEN_SECRETE"), data_services.GetNewToken)
 	if err != nil {
+		fmt.Println("GetNewToken : Token Validation")
 		return nil, status.Errorf(codes.Unauthenticated, "Request With Invalid Token")
 	}
 
@@ -167,7 +171,7 @@ func (authenticationServer *AuthenticationServer) Signup(ctx context.Context, re
 	fmt.Println("Temp contact to cash is set")
 
 	fmt.Println("Generating Refresh and Auth Token")
-	refreshToken, authToken, err := authenticationServer.data.GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx, userId.String(), false, []int{data_services.GetNewToken, data_services.ResendOTP, data_services.ConformContact})
+	refreshToken, authToken, err := authenticationServer.data.GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx, userId.String(), "", false, []int{data_services.GetNewToken, data_services.ResendOTP, data_services.ConformContact})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Unable To Generate Refresh Token")
 	}
@@ -225,14 +229,14 @@ func (authenticationServer *AuthenticationServer) SignIn(ctx context.Context, re
 	fmt.Println("Sanitization and Validation Completed")
 
 	fmt.Println("Started SignIn Process")
-	userId, err := authenticationServer.data.SignIn(phoneNo, password)
+	userId, userName, err := authenticationServer.data.SignIn(phoneNo, password)
 	if err != nil {
 		return nil, status.Errorf(codes.PermissionDenied, "Unable To Authenticate")
 	}
 	fmt.Println("Completed SignIn Process")
 
 	fmt.Println("Generating token")
-	refreshToken, authToken, err := authenticationServer.data.GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx, userId, true, []int{data_services.LogOut, data_services.GetNewToken, data_services.External})
+	refreshToken, authToken, err := authenticationServer.data.GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx, userId, userName, true, []int{data_services.LogOut, data_services.GetNewToken, data_services.External})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Unable To Generate Refresh Token")
 	}
@@ -259,7 +263,7 @@ func (authenticationServer *AuthenticationServer) Logout(ctx context.Context, re
 		return &pb.LogoutResponse{Status: false}, status.Errorf(codes.Unauthenticated, "Request With Invalid Token")
 	}
 
-	err = authenticationServer.data.DelDataFromCash(ctx, token.Subject) // Do care for refresh token
+	err = authenticationServer.data.DelDataFromCash(ctx, token.Jti) // Do care for refresh token
 	if err != nil {
 		// Token Expired or Internal Discrepancies.
 	}
@@ -312,7 +316,7 @@ func (authenticationServer *AuthenticationServer) ContactConformation(ctx contex
 		}
 		// To Here Extra Check
 
-		err = authenticationServer.data.DelDataFromCash(ctx, token.Subject)
+		err = authenticationServer.data.DelDataFromCash(ctx, token.Jti)
 		if err != nil {
 			// Capture Error When Logging
 			// Inconsistency with cash.
@@ -337,7 +341,7 @@ func (authenticationServer *AuthenticationServer) ContactConformation(ctx contex
 			return nil, status.Errorf(codes.Unknown, "Unable To Create User") // If User Already Exist Then Report Inconsistency with cash and database
 		}
 
-		refreshTok, authTok, err := authenticationServer.data.GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx, token.Audience, true, []int{data_services.LogOut, data_services.GetNewToken, data_services.External})
+		refreshTok, authTok, err := authenticationServer.data.GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx, token.Audience, data.Username, true, []int{data_services.LogOut, data_services.GetNewToken, data_services.External})
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "Unable To Generate Refresh Token")
 		}
@@ -353,29 +357,42 @@ func (authenticationServer *AuthenticationServer) ContactConformation(ctx contex
 
 func (authenticationServer *AuthenticationServer) ResendOTP(ctx context.Context, request *pb.ResendOTPRequest) (*pb.ResendOTPResponse, error) {
 
+	fmt.Println("ResendOTP : API Key Checking ")
 	if !helpers.CheckForAPIKey(request.GetApiKey()) {
+		fmt.Println("ResendOTP : API Key")
 		return nil, status.Errorf(codes.Unauthenticated, "No API Key Is Specified")
 	}
 
+	fmt.Println("ResendOTP : Token Validation ")
 	token, err := authenticationServer.data.ValidateToken(ctx, request.GetToken(), os.Getenv("AUTH_TOKEN_SECRETE"), data_services.ResendOTP)
 	if err != nil {
+		fmt.Println("ResendOTP : Validate Token : ", err)
 		return nil, status.Errorf(codes.Unauthenticated, "Request With Invalid Token")
 	}
 
+	fmt.Println("ResendOTP : Authorizing ")
 	// From Here
 	var authorized bool
 	if err = token.Get("authorized", &authorized); err != nil {
+		fmt.Println("ResendOTP : Authorized")
 		return nil, status.Errorf(codes.Unauthenticated, "Request With Invalid Token")
 	}
+
+	fmt.Println("ResendOTP : Checking For Authorized ")
 	if authorized {
+		fmt.Println("ResendOTP : Authorized")
 		return nil, status.Errorf(codes.Unauthenticated, "Request With Invalid Token") // Some Problem occurred Request made with token is of authorized user who has no permission to access this rpc.
 	}
 	// To Here Extra Check.
 
+	fmt.Println("ResendOTP : Checking In Cache ")
 	val, err := authenticationServer.data.GetDataFromCash(ctx, token.Audience)
 	if err != nil {
+		fmt.Println("ResendOTP : Checking In Cache Error :  ", err)
 		return nil, status.Errorf(codes.Unknown, "OTP Token Not Found") // Some Problem Occurred Sent OTP Is Expired Or Not Sent.
 	}
+
+	fmt.Println("ResendOTP : Checking In Cache Done ")
 
 	var data structs.OTPCashData
 	structs.UnmarshalOTPCash([]byte(val), &data)
@@ -389,7 +406,7 @@ func (authenticationServer *AuthenticationServer) ResendOTP(ctx context.Context,
 
 	switch data.ResendTimes {
 	case 0:
-		err = authenticationServer.data.GenerateAndSendOTP(ctx, token.Audience, data.PhoneNo, 1, data_services.Validation5Min)
+		err = authenticationServer.data.GenerateAndSendOTP(ctx, token.Audience, data.PhoneNo, 1, data_services.Validation5Min+data_services.Validation5Min)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "Unable To Send OTP")
 		}
@@ -401,7 +418,7 @@ func (authenticationServer *AuthenticationServer) ResendOTP(ctx context.Context,
 
 	case 1:
 		if time.Now().Sub(data.Time) >= data_services.Validation5Min {
-			err = authenticationServer.data.GenerateAndSendOTP(ctx, token.Audience, data.PhoneNo, 2, data_services.Validation10Min)
+			err = authenticationServer.data.GenerateAndSendOTP(ctx, token.Audience, data.PhoneNo, 2, data_services.Validation10Min+data_services.Validation5Min)
 			if err != nil {
 				return nil, status.Errorf(codes.Internal, "Unable To Send OTP")
 			}
@@ -414,12 +431,12 @@ func (authenticationServer *AuthenticationServer) ResendOTP(ctx context.Context,
 
 		return &pb.ResendOTPResponse{
 			Response:                 pb.OTPResponse_NotOk,
-			TimeToWaitForNextRequest: ptypes.DurationProto(time.Now().Sub(data.Time)),
+			TimeToWaitForNextRequest: ptypes.DurationProto(data_services.Validation5Min.Truncate(time.Now().Sub(data.Time))),
 		}, nil
 
 	case 2:
 		if time.Now().Sub(data.Time) >= data_services.Validation10Min {
-			err = authenticationServer.data.GenerateAndSendOTP(ctx, token.Audience, data.PhoneNo, 3, data_services.Validation15Min)
+			err = authenticationServer.data.GenerateAndSendOTP(ctx, token.Audience, data.PhoneNo, 3, data_services.Validation1Day)
 			if err != nil {
 				return nil, status.Errorf(codes.Internal, "Unable To Send OTP")
 			}
@@ -432,15 +449,14 @@ func (authenticationServer *AuthenticationServer) ResendOTP(ctx context.Context,
 
 		return &pb.ResendOTPResponse{
 			Response:                 pb.OTPResponse_NotOk,
-			TimeToWaitForNextRequest: ptypes.DurationProto(time.Now().Sub(data.Time)),
+			TimeToWaitForNextRequest: ptypes.DurationProto(data_services.Validation10Min.Truncate(time.Now().Sub(data.Time))),
 		}, nil
 
-	case 3:
 	default:
+		fmt.Println("You Exhausted Your OTP Limit")
 		return nil, status.Errorf(codes.ResourceExhausted, "You Exhausted Your OTP Limit")
 
 	}
-	return nil, status.Errorf(codes.Unknown, "Unable To Process Request")
 }
 
 func (authenticationServer *AuthenticationServer) ForgetPassword(ctx context.Context, request *pb.ForgetPasswordRequest) (*pb.ForgetPasswordResponse, error) {
@@ -459,7 +475,12 @@ func (authenticationServer *AuthenticationServer) ForgetPassword(ctx context.Con
 		return nil, status.Errorf(codes.PermissionDenied, "Not exist")
 	}
 
-	refreshToken, authToken, err := authenticationServer.data.GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx, id, false, []int{data_services.GetNewToken, data_services.ResendOTP, data_services.ForgetPassword})
+	_, err = authenticationServer.data.GetDataFromCash(ctx, id)
+	if err == nil {
+		return nil, status.Errorf(codes.AlreadyExists, "OTP Is Already Sent To User")
+	}
+
+	refreshToken, authToken, err := authenticationServer.data.GenerateRefreshAndAuthTokenAndAddRefreshToCash(ctx, id, "", false, []int{data_services.GetNewToken, data_services.ResendOTP, data_services.ForgetPassword})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Unable To Generate Refresh Token")
 	}
@@ -480,20 +501,24 @@ func (authenticationServer *AuthenticationServer) ForgetPassword(ctx context.Con
 func (authenticationServer *AuthenticationServer) ConformForgetPasswordOTP(ctx context.Context, request *pb.ConformForgetPasswordOTPRequest) (*pb.ConformForgetPasswordOTPResponse, error) {
 
 	if !helpers.CheckForAPIKey(request.GetApiKey()) {
+		fmt.Println("ConformForgetPasswordOTP : API Key")
 		return nil, status.Errorf(codes.Unauthenticated, "No API Key Is Specified")
 	}
 
 	token, err := authenticationServer.data.ValidateToken(ctx, request.GetToken(), os.Getenv("AUTH_TOKEN_SECRETE"), data_services.ForgetPassword)
 	if err != nil {
+		fmt.Println("ConformForgetPasswordOTP : Token Validation")
 		return nil, status.Errorf(codes.Unauthenticated, "Request With Invalid Token")
 	}
 
 	// From Here
 	var authorized bool
 	if err = token.Get("authorized", &authorized); err != nil {
+		fmt.Println("ConformForgetPasswordOTP : Authorized")
 		return nil, status.Errorf(codes.Unauthenticated, "Request With Invalid Token")
 	}
 	if authorized {
+		fmt.Println("ConformForgetPasswordOTP : Authorized")
 		return nil, status.Errorf(codes.Unauthenticated, "Request With Invalid Token")
 	}
 	// To Here Extra Check
@@ -511,7 +536,7 @@ func (authenticationServer *AuthenticationServer) ConformForgetPasswordOTP(ctx c
 
 	if val.OTP == request.GetOtp() {
 
-		err = authenticationServer.data.DelDataFromCash(ctx, token.Subject)
+		err = authenticationServer.data.DelDataFromCash(ctx, token.Jti)
 		if err != nil {
 			// Capture Error When Logging
 			// Inconsistency with cash.
